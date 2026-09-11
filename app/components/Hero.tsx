@@ -22,14 +22,17 @@ export function Hero() {
               back — straight from your counter.
             </p>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="mt-8 flex flex-col items-start gap-2.5">
               <a
                 href="#cta"
                 className="inline-flex h-[54px] items-center justify-center gap-2.5 rounded-full bg-[#0A0A0B] px-8 text-[15.5px] font-bold text-white transition-all hover:bg-[#27272A]"
               >
-                <span>Get early access</span>
+                <span>Start 1-week free trial</span>
                 <IconArrowRight className="h-4 w-4" />
               </a>
+              <p className="text-[13px] text-[#71717A]">
+                No charge · Zero commitment required
+              </p>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-[#71717A] sm:text-[13.5px]">

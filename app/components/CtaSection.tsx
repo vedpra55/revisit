@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import {
-  IconArrowRight,
+  IconCheck,
   IconTrendingUp,
   IconUsers,
   IconHeart,
@@ -19,9 +19,9 @@ export function CtaSection() {
   const [phone, setPhone] = useState("");
   const [outlets, setOutlets] = useState("");
 
-  const whatsappMessage = `Hi, I'm ${name.trim() || "interested"} from ${cafeName.trim() || "my café"}. We have ${outlets.trim() || "1"} outlet(s). I would like early access to Revisit! Contact: ${phone.trim() || "my phone"}`;
+  const whatsappMessage = `Hi, I'm ${name.trim() || "interested"} from ${cafeName.trim() || "my café"}. We have ${outlets.trim() || "1"} outlet(s). I would like to start a 1-week free trial of Revisit! Contact: ${phone.trim() || "my phone"}`;
   const whatsappUrl = `https://wa.me/916203703070?text=${encodeURIComponent(whatsappMessage)}`;
-  const mailtoUrl = `mailto:vedna400@gmail.com?subject=${encodeURIComponent("Early Access to Revisit")}&body=${encodeURIComponent(whatsappMessage)}`;
+  const mailtoUrl = `mailto:vedna400@gmail.com?subject=${encodeURIComponent("1-Week Free Trial — Revisit")}&body=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <section id="cta" className="bg-[#FAFAFA] py-16 sm:py-24">
@@ -38,7 +38,7 @@ export function CtaSection() {
             </h2>
 
             <p className="mt-5 max-w-[44ch] text-[16px] leading-relaxed text-[#52525B] sm:text-[17.5px]">
-              Start with one outlet and see what Revisit can do.
+              Start with a 1-week free trial on one outlet. No charge, zero commitment required.
             </p>
 
             {/* 3 Metric Pills (White, No Border, No Shadow) */}
@@ -57,14 +57,10 @@ export function CtaSection() {
               </div>
             </div>
 
-            <div className="mt-8">
-              <a
-                href="#lead-form"
-                className="inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-[#0A0A0B] px-8 text-[15.5px] font-bold text-white transition-colors hover:bg-[#27272A]"
-              >
-                <span>Get early access</span>
-                <IconArrowRight className="h-4 w-4" />
-              </a>
+            {/* 1-Week Free Trial Trust Pill (Replaces redundant button) */}
+            <div className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2.5 text-[13px] font-medium text-[#0A0A0B]">
+              <IconCheck className="h-4 w-4 text-[#047857]" />
+              <span>1-week free trial · No charge · Zero commitment</span>
             </div>
 
             <p className="mt-6 text-[13px] text-[#71717A]">
@@ -75,11 +71,16 @@ export function CtaSection() {
           {/* Right Column: Interactive "Let's talk" Form (White Apple Squircle, No Border, No Shadow) */}
           <div id="lead-form" className="relative w-full max-w-full rounded-[24px] bg-white p-5 sm:rounded-[32px] sm:p-8 md:p-9">
             <div>
-              <h3 className="text-[22px] font-bold tracking-tight text-[#0A0A0B] sm:text-[24px]">
-                Let&apos;s talk
-              </h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-[22px] font-bold tracking-tight text-[#0A0A0B] sm:text-[24px]">
+                  Let&apos;s talk
+                </h3>
+                <span className="rounded-full bg-[#FAFAFA] px-3 py-1 text-[12px] font-semibold text-[#047857]">
+                  1-week free trial
+                </span>
+              </div>
               <p className="mt-1 text-[13.5px] text-[#52525B] sm:text-[14px]">
-                Share a few details and we&apos;ll get in touch.
+                Share a few details and we&apos;ll set up your trial. No charge, zero commitment.
               </p>
             </div>
 
@@ -170,7 +171,7 @@ export function CtaSection() {
             </a>
 
             <p className="mt-4 text-center text-[11.5px] leading-relaxed text-[#71717A]">
-              We&apos;ll reach out to understand your setup and share early access details.
+              We&apos;ll reach out to understand your setup and activate your 1-week free trial.
             </p>
           </div>
         </div>
