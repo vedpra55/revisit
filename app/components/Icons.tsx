@@ -1,5 +1,14 @@
 import React from "react";
 
+export function IconLogo({ className = "w-7 h-7", ...props }: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="64" height="64" rx="16" fill="#0A0A0B" />
+      <path d="M 19 16 L 36 16 C 43.5 16 48 20 48 26.5 C 48 31.8 44.5 35.2 38.5 36.2 L 48.5 48 L 40 48 L 31.5 37.5 L 26.5 37.5 L 26.5 48 L 19 48 Z M 26.5 22.5 L 26.5 31.5 L 35 31.5 C 38.5 31.5 40.5 29.8 40.5 27 C 40.5 24.2 38.5 22.5 35 22.5 Z" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
 export function IconSearch({ className = "w-5 h-5", ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>

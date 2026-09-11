@@ -1,10 +1,12 @@
 import React from "react";
+import { IconLogo } from "./Icons";
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/[0.04] bg-[#FAFAFA]/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-[1140px] items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="flex items-center gap-2">
+        <a href="#top" className="flex items-center gap-2.5">
+          <IconLogo className="h-7 w-7 shrink-0" />
           <span className="text-[20px] font-bold tracking-tight text-[#0A0A0B]">revisit</span>
         </a>
 
