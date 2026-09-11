@@ -4,7 +4,7 @@ import { IconArrowRight } from "./Icons";
 
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-[#FAFAFA] pt-10 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
+    <section id="top" className="relative overflow-hidden bg-[#FAFAFA] pt-16 pb-16 sm:pt-24 sm:pb-24 lg:pt-32 lg:pb-28">
       <div className="mx-auto w-full max-w-[1140px] px-5 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-8">
           {/* Left Column */}
