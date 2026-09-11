@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --breakpoint-tab: 880px;
+  --color-ink: #0a0a0b;
+  --color-paper: #ffffff;
+  --color-line: #e4e4e7;
+  --color-wash: #f4f4f5;
+  --color-mute: #71717a;
+  --color-faint: #a1a1aa;
+  --color-accent: #ff4d00;
+  --color-accent-ink: #c93a00;
+  --color-accent-wash: #fff1ea;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background: #fafafa;
+  color: #0a0a0b;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #0a0a0b;
+  color: #fff;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.dot-grid {
+  background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.hairline {
+  border-color: #e4e4e7;
+}
+
+.tick-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.flow-dash {
+  stroke-dasharray: 6 6;
+  animation: dashmove 1.6s linear infinite;
+}
+
+@keyframes dashmove {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-dash {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
