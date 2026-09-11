@@ -37,7 +37,7 @@ export function CtaSection() {
             </h2>
 
             <p className="mt-5 max-w-[44ch] text-[16px] leading-relaxed text-[#52525B] sm:text-[17.5px]">
-              Start with a 1-week free trial on one outlet and see what Revisit can do.
+              Start with one outlet and see what Revisit can do.
             </p>
 
             {/* 3 Metric Pills (White, No Border, No Shadow) */}
@@ -64,9 +64,14 @@ export function CtaSection() {
           {/* Right Column: Interactive "Let's talk" Form (White Apple Squircle, No Border, No Shadow) */}
           <div id="lead-form" className="relative w-full max-w-full rounded-[24px] bg-white p-5 sm:rounded-[32px] sm:p-8 md:p-9">
             <div>
-              <h3 className="text-[22px] font-bold tracking-tight text-[#0A0A0B] sm:text-[24px]">
-                Let&apos;s talk
-              </h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-[22px] font-bold tracking-tight text-[#0A0A0B] sm:text-[24px]">
+                  Let&apos;s talk
+                </h3>
+                <span className="inline-flex shrink-0 items-center rounded-full bg-[#0A0A0B] px-3.5 py-1 text-[11.5px] font-semibold text-white">
+                  1-week free trial
+                </span>
+              </div>
               <p className="mt-1 text-[13.5px] text-[#52525B] sm:text-[14px]">
                 Share a few details and we&apos;ll get in touch.
               </p>
