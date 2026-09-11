@@ -17,7 +17,7 @@ export function CtaSection() {
   const [name, setName] = useState("");
   const [cafeName, setCafeName] = useState("");
   const [phone, setPhone] = useState("");
-  const [outlets, setOutlets] = useState("1");
+  const [outlets, setOutlets] = useState("");
 
   const whatsappMessage = `Hi, I'm ${name.trim() || "interested"} from ${cafeName.trim() || "my café"}. We have ${outlets.trim() || "1"} outlet(s). I would like early access to Revisit! Contact: ${phone.trim() || "my phone"}`;
   const whatsappUrl = `https://wa.me/916203703070?text=${encodeURIComponent(whatsappMessage)}`;
