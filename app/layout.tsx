@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -74,7 +75,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${dmSans.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#FAFAFA] text-[#0A0A0B]">{children}</body>
+      <body className="min-h-full bg-[#FAFAFA] text-[#0A0A0B]">
+        {children}
+        <Script id="clarity-script" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "yh7hpm2nzb");
+          `}
+        </Script>
+      </body>
     </html>
   );
 }
