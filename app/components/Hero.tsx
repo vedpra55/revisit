@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { IconArrowRight } from "./Icons";
 
 export function Hero() {
@@ -23,13 +24,23 @@ export function Hero() {
             </p>
 
             <div className="mt-8 flex flex-col items-start gap-2.5">
-              <a
-                href="#cta"
-                className="inline-flex h-[54px] items-center justify-center gap-2.5 rounded-full bg-[#0A0A0B] px-8 text-[15.5px] font-bold text-white transition-all hover:bg-[#27272A]"
-              >
-                <span>Start 1-week free trial</span>
-                <IconArrowRight className="h-4 w-4" />
-              </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="#cta"
+                  className="inline-flex h-[54px] items-center justify-center gap-2.5 rounded-full bg-[#0A0A0B] px-8 text-[15.5px] font-bold text-white transition-all hover:bg-[#27272A]"
+                >
+                  <span>Start 1-week free trial</span>
+                  <IconArrowRight className="h-4 w-4" />
+                </a>
+
+                <Link
+                  href="/demo"
+                  className="inline-flex h-[54px] items-center justify-center gap-2 rounded-full border border-black/[0.12] bg-white px-7 text-[15px] font-semibold text-[#0A0A0B] hover:bg-black/[0.03] transition-all"
+                >
+                  <span>Try live demo</span>
+                  <span className="text-[14px]">→</span>
+                </Link>
+              </div>
               <p className="text-[13px] text-[#71717A]">
                 No charge · Zero commitment required
               </p>

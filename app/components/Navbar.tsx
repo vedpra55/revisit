@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { IconLogo } from "./Icons";
 
 export function Navbar() {
@@ -17,7 +18,13 @@ export function Navbar() {
           <a href="#impact" className="transition-colors hover:text-black">For restaurants</a>
         </nav>
 
-        <div>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/demo"
+            className="hidden sm:inline-flex h-10 items-center rounded-full border border-black/[0.1] bg-white px-4 text-[13.5px] font-semibold text-[#0A0A0B] transition-colors hover:bg-black/[0.03]"
+          >
+            Live Demo
+          </Link>
           <a
             href="#cta"
             className="inline-flex h-10 items-center rounded-full bg-[#0A0A0B] px-5 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#27272A]"
