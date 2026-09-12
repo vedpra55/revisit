@@ -1,4 +1,4 @@
-import { Customer, BillItem } from "./types";
+import { Customer, BillItem, OfferRule } from "./types";
 
 export const INITIAL_CUSTOMERS: Customer[] = [
   {
@@ -121,3 +121,55 @@ export const AVAILABLE_MENU_ITEMS = [
   { name: "Flat White", price: 190 },
   { name: "Croissant", price: 150 },
 ];
+
+export const INITIAL_OFFER_RULES: OfferRule[] = [
+  {
+    id: "r1",
+    name: "5th Visit Milestone",
+    triggerType: "visits_milestone",
+    triggerValue: 5,
+    rewardType: "flat_discount",
+    rewardValue: 100,
+    minBill: 350,
+    expiryDays: 14,
+    isActive: true,
+    description: "Give ₹100 OFF when a customer completes their 5th visit",
+  },
+  {
+    id: "r2",
+    name: "Overdue Regular Win-Back",
+    triggerType: "days_overdue",
+    triggerValue: 3,
+    rewardType: "flat_discount",
+    rewardValue: 100,
+    minBill: 350,
+    expiryDays: 7,
+    isActive: true,
+    description: "Send ₹100 OFF when a regular is 3+ days past their normal visit cycle",
+  },
+  {
+    id: "r3",
+    name: "VIP Spender Reward",
+    triggerType: "total_spend",
+    triggerValue: 3000,
+    rewardType: "percent_discount",
+    rewardValue: 15,
+    minBill: 500,
+    expiryDays: 30,
+    isActive: true,
+    description: "Give 15% OFF for customers who have spent over ₹3,000",
+  },
+  {
+    id: "r4",
+    name: "Visit #2 Quick Nudge",
+    triggerType: "inactivity",
+    triggerValue: 10,
+    rewardType: "flat_discount",
+    rewardValue: 50,
+    minBill: 250,
+    expiryDays: 7,
+    isActive: true,
+    description: "Give ₹50 OFF if a new customer hasn't returned within 10 days",
+  },
+];
+
