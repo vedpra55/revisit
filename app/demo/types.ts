@@ -50,6 +50,8 @@ export interface OfferRule {
 export interface CafeSettings {
   deadHoursEnabled: boolean;
   deadHoursDays: string;
+  deadHoursStartTime: string;
+  deadHoursEndTime: string;
   deadHoursTime: string;
   googleMapsReviewUrl: string;
   autoGoogleReviewTriggerVisits: number;

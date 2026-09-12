@@ -176,6 +176,8 @@ export const INITIAL_OFFER_RULES: OfferRule[] = [
 export const DEFAULT_CAFE_SETTINGS: CafeSettings = {
   deadHoursEnabled: true,
   deadHoursDays: "Tuesday – Thursday",
+  deadHoursStartTime: "14:00",
+  deadHoursEndTime: "18:00",
   deadHoursTime: "2:00 PM – 6:00 PM",
   googleMapsReviewUrl: "https://g.page/r/the-daily-brew-indiranagar/review",
   autoGoogleReviewTriggerVisits: 3,

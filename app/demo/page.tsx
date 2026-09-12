@@ -19,6 +19,17 @@ import {
 import { Customer, OfferRule, TriggerType, RewardType, CafeSettings } from "./types";
 import { INITIAL_CUSTOMERS, INITIAL_OFFER_RULES, DEFAULT_CAFE_SETTINGS } from "./mockData";
 
+function formatTime12h(timeStr: string): string {
+  if (!timeStr) return "";
+  const parts = timeStr.split(":");
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10) || 0;
+  if (isNaN(h)) return timeStr;
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${m.toString().padStart(2, "0")} ${period}`;
+}
+
 export default function DemoPage() {
   // Main Navigation: 'counter' | 'rules' | 'retention' | 'customers' | 'impact' | 'settings'
   const [activeNav, setActiveNav] = useState<
@@ -1472,18 +1483,15 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 4. DEDICATED SETTINGS PAGE (PROFESSIONAL MULTI-SECTION SETTINGS)      */}
+          {/* 4. DEDICATED SETTINGS PAGE (STREAMLINED CONTROLS & EXPLANATION)      */}
           {/* ===================================================================== */}
           {activeNav === "settings" && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div className="border-b border-black/[0.06] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h1 className="text-[18px] sm:text-[22px] font-bold tracking-tight text-[#0A0A0B]">
-                    Restaurant Settings
+                    Settings
                   </h1>
-                  <p className="text-[12px] sm:text-[13px] text-[#71717A]">
-                    Configure your outlet preferences, dead hours yield management, and Google reviews.
-                  </p>
                 </div>
 
                 {settingsSavedNotice && (
@@ -1549,15 +1557,10 @@ export default function DemoPage() {
               {settingsTab === "deadhours" && (
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-[15px] font-bold text-[#0A0A0B]">
-                          Dead Hours Yield Automation
-                        </h3>
-                        <p className="text-[12px] text-[#52525B] mt-0.5 leading-relaxed">
-                          Do not give discounts on Friday night or Sunday brunch when tables are full. Shift win-back rewards to slow afternoon hours to fill empty seats.
-                        </p>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
+                        Dead Hours Yield Automation
+                      </h3>
 
                       <button
                         onClick={() =>
@@ -1576,43 +1579,74 @@ export default function DemoPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
                       <div>
                         <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Days</label>
-                        <input
-                          type="text"
+                        <select
                           value={settings.deadHoursDays}
                           onChange={(e) =>
                             setSettings({ ...settings, deadHoursDays: e.target.value })
                           }
-                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                        />
-                        <p className="text-[10.5px] text-[#71717A] mt-1">e.g. Tuesday – Thursday</p>
+                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-2 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                        >
+                          <option value="Tuesday – Thursday">Tuesday – Thursday (Midweek)</option>
+                          <option value="Monday – Thursday">Monday – Thursday</option>
+                          <option value="Monday – Wednesday">Monday – Wednesday</option>
+                          <option value="Wednesday & Thursday">Wednesday & Thursday</option>
+                          <option value="Monday – Friday">Monday – Friday (All Weekdays)</option>
+                        </select>
                       </div>
 
                       <div>
                         <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Window</label>
-                        <input
-                          type="text"
-                          value={settings.deadHoursTime}
-                          onChange={(e) =>
-                            setSettings({ ...settings, deadHoursTime: e.target.value })
-                          }
-                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                        />
-                        <p className="text-[10.5px] text-[#71717A] mt-1">e.g. 2:00 PM – 6:00 PM</p>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <div>
+                            <span className="text-[10.5px] text-[#71717A] block mb-0.5">From</span>
+                            <input
+                              type="time"
+                              value={settings.deadHoursStartTime}
+                              onChange={(e) => {
+                                const newStart = e.target.value;
+                                const formatted = `${formatTime12h(newStart)} – ${formatTime12h(settings.deadHoursEndTime)}`;
+                                setSettings({
+                                  ...settings,
+                                  deadHoursStartTime: newStart,
+                                  deadHoursTime: formatted,
+                                });
+                              }}
+                              className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1.5 font-medium text-[#0A0A0B] text-[12px] focus:outline-none focus:border-[#0A0A0B]"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10.5px] text-[#71717A] block mb-0.5">To</span>
+                            <input
+                              type="time"
+                              value={settings.deadHoursEndTime}
+                              onChange={(e) => {
+                                const newEnd = e.target.value;
+                                const formatted = `${formatTime12h(settings.deadHoursStartTime)} – ${formatTime12h(newEnd)}`;
+                                setSettings({
+                                  ...settings,
+                                  deadHoursEndTime: newEnd,
+                                  deadHoursTime: formatted,
+                                });
+                              }}
+                              className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1.5 font-medium text-[#0A0A0B] text-[12px] focus:outline-none focus:border-[#0A0A0B]"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Protected Weekend Shield */}
+                    {/* Bottom side explanation */}
                     <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
                       <div className="flex items-center gap-1.5 text-[#0A0A0B] font-bold">
                         <span>🔒 Weekend Margin Shield</span>
                         <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px]">Active</span>
                       </div>
-                      <p className="text-[#52525B]">
-                        Friday 7–11 PM and Sat–Sun all day are strictly protected. No automated discounts are offered for peak weekend dining.
+                      <p className="text-[#52525B] leading-relaxed">
+                        Offers are scheduled only for slow afternoons ({settings.deadHoursDays}, {settings.deadHoursTime}) to fill empty tables. Peak weekend hours (Fri–Sun) are automatically locked to protect full-price revenue.
                       </p>
                     </div>
 
-                    <div className="pt-2 flex justify-end">
+                    <div className="pt-1 flex justify-end">
                       <button
                         onClick={handleSaveSettings}
                         className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
@@ -1628,13 +1662,13 @@ export default function DemoPage() {
               {settingsTab === "google" && (
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
-                    <div>
-                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
                         Google Maps Review Booster
                       </h3>
-                      <p className="text-[12px] text-[#52525B] mt-0.5">
-                        In India, a 4.5+ star rating on Google Maps drives over 60% of new walk-in diners. Automatically ask proven regulars to rate you.
-                      </p>
+                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">
+                        Active
+                      </span>
                     </div>
 
                     <div className="text-[12px] space-y-3">
@@ -1653,7 +1687,7 @@ export default function DemoPage() {
                           />
                           <button
                             onClick={() => window.open(settings.googleMapsReviewUrl, "_blank")}
-                            className="rounded-lg border border-black/[0.1] px-3 py-1.5 font-semibold text-[#52525B] hover:bg-black/5 shrink-0"
+                            className="rounded-lg border border-black/[0.1] px-3 py-1.5 font-semibold text-[#52525B] hover:bg-black/5 shrink-0 cursor-pointer"
                           >
                             Test Link ↗
                           </button>
@@ -1680,13 +1714,21 @@ export default function DemoPage() {
                             className="w-16 text-center rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1 font-bold text-[#0A0A0B]"
                           />
                         </div>
-                        <p className="text-[10.5px] text-[#71717A] mt-1">
-                          Recommendation: 3 visits ensures 98% satisfaction and shields you from 1-star reviews.
-                        </p>
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-end">
+                    {/* Bottom side explanation */}
+                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
+                      <div className="flex items-center gap-1.5 text-[#0A0A0B] font-bold">
+                        <span>⭐ Regular-Only Protection</span>
+                        <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px]">Shield Active</span>
+                      </div>
+                      <p className="text-[#52525B]">
+                        Review links are only sent to regulars who have completed at least {settings.autoGoogleReviewTriggerVisits} visits. This filters out first-time issues and guarantees positive 5★ ratings.
+                      </p>
+                    </div>
+
+                    <div className="pt-1 flex justify-end">
                       <button
                         onClick={handleSaveSettings}
                         className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
@@ -1702,11 +1744,9 @@ export default function DemoPage() {
               {settingsTab === "pos" && (
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
-                    <div>
-                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">Outlet & POS Connection</h3>
-                      <p className="text-[#52525B] mt-0.5">
-                        Revisit works on top of your existing billing machine without POS replacements.
-                      </p>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">Outlet & POS Connection</h3>
+                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">Connected</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1740,13 +1780,14 @@ export default function DemoPage() {
                       </select>
                     </div>
 
-                    <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[#065F46]">
+                    {/* Bottom side explanation */}
+                    <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[#065F46] space-y-1">
                       <p className="font-bold text-[#047857] flex items-center gap-1.5">
                         <IconCheck className="h-4 w-4" />
-                        <span>Integration Mode: Receipt Camera OCR (Active)</span>
+                        <span>Integration Mode: Receipt Camera OCR</span>
                       </p>
                       <p className="mt-0.5 text-[11px]">
-                        Zero API complexity. The cashier simply takes a 2-second photo of the printed bill.
+                        Cashiers take a photo of the printed paper bill. Revisit extracts totals and line items without needing direct POS API changes.
                       </p>
                     </div>
                   </div>
@@ -1757,32 +1798,28 @@ export default function DemoPage() {
               {settingsTab === "whatsapp" && (
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
-                    <div>
-                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">WhatsApp Outreach Guardrails</h3>
-                      <p className="text-[#52525B] mt-0.5">
-                        Configure sender rules to prevent customer fatigue and avoid Meta bot fees.
-                      </p>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">WhatsApp Outreach Guardrails</h3>
+                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">Protected</span>
                     </div>
 
-                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#0A0A0B]">Delivery Mode</span>
-                        <span className="rounded bg-[#ECFDF5] text-[#047857] font-bold px-2 py-0.5 text-[10.5px]">
-                          Manual Send (wa.me)
-                        </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3">
+                        <span className="text-[11px] text-[#71717A] block mb-0.5 font-medium">Delivery Mode</span>
+                        <span className="font-bold text-[#0A0A0B] text-[12.5px] block">Manual Send (wa.me)</span>
                       </div>
-                      <p className="text-[#52525B] text-[11.5px]">
-                        Messages arrive directly from your café owner / counter number. Zero per-message utility fees, zero Meta template approval delays.
-                      </p>
+
+                      <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3">
+                        <span className="text-[11px] text-[#71717A] block mb-0.5 font-medium">Frequency Limit</span>
+                        <span className="font-bold text-[#0A0A0B] text-[12.5px] block">Max 1 per 14 days</span>
+                      </div>
                     </div>
 
-                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#0A0A0B]">Anti-Spam Frequency Cap</span>
-                        <span className="font-bold text-[#0A0A0B]">Max 1 per 14 days</span>
-                      </div>
-                      <p className="text-[#52525B] text-[11.5px]">
-                        Revisit ensures you never message the same customer more than once in a 2-week window.
+                    {/* Bottom side explanation */}
+                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
+                      <p className="font-bold text-[#0A0A0B]">💬 Direct WhatsApp Dispatch</p>
+                      <p className="text-[#52525B]">
+                        Messages dispatch directly from your device using wa.me links to eliminate per-conversation Meta fees, capped at 1 message per 14 days per guest.
                       </p>
                     </div>
                   </div>
