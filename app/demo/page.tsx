@@ -13,15 +13,20 @@ import {
   IconTrendingUp,
   IconClock,
   IconStar,
+  IconSettings,
+  IconStore,
 } from "../components/Icons";
 import { Customer, OfferRule, TriggerType, RewardType, CafeSettings } from "./types";
 import { INITIAL_CUSTOMERS, INITIAL_OFFER_RULES, DEFAULT_CAFE_SETTINGS } from "./mockData";
 
 export default function DemoPage() {
-  // Navigation: 'counter' | 'rules' | 'retention' | 'customers' | 'impact' | 'settings'
+  // Main Navigation: 'counter' | 'rules' | 'retention' | 'customers' | 'impact' | 'settings'
   const [activeNav, setActiveNav] = useState<
     "counter" | "rules" | "retention" | "customers" | "impact" | "settings"
   >("counter");
+
+  // Settings page sub-tab: 'deadhours' | 'google' | 'pos' | 'whatsapp'
+  const [settingsTab, setSettingsTab] = useState<"deadhours" | "google" | "pos" | "whatsapp">("deadhours");
 
   // Global demo state
   const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
@@ -253,6 +258,11 @@ export default function DemoPage() {
     setIsCreateRuleOpen(false);
   };
 
+  const handleSaveSettings = () => {
+    setSettingsSavedNotice(true);
+    setTimeout(() => setSettingsSavedNotice(false), 3500);
+  };
+
   const handleFullReset = () => {
     setCustomers(INITIAL_CUSTOMERS);
     setOfferRules(INITIAL_OFFER_RULES);
@@ -265,6 +275,7 @@ export default function DemoPage() {
     setIsRewardAppliedInPos(true);
     setActiveRetentionId("c1");
     setRetentionMessageMode("deadhours");
+    setCustomEditedMessage(null);
     setSimulatedReturnNotice(null);
   };
 
@@ -345,18 +356,6 @@ export default function DemoPage() {
             </button>
 
             <button
-              onClick={() => setActiveNav("settings")}
-              className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-left cursor-pointer ${
-                activeNav === "settings"
-                  ? "bg-[#0A0A0B] text-white font-semibold shadow-xs"
-                  : "text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#0A0A0B]"
-              }`}
-            >
-              <IconClock className="h-4 w-4 shrink-0 text-[#D97706]" />
-              <span>Dead Hours & Google</span>
-            </button>
-
-            <button
               onClick={() => setActiveNav("customers")}
               className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-left cursor-pointer ${
                 activeNav === "customers"
@@ -378,6 +377,18 @@ export default function DemoPage() {
             >
               <IconTrendingUp className="h-4 w-4 shrink-0" />
               <span>Business impact</span>
+            </button>
+
+            <button
+              onClick={() => setActiveNav("settings")}
+              className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-left cursor-pointer ${
+                activeNav === "settings"
+                  ? "bg-[#0A0A0B] text-white font-semibold shadow-xs"
+                  : "text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#0A0A0B]"
+              }`}
+            >
+              <IconSettings className="h-4 w-4 shrink-0" />
+              <span>Settings</span>
             </button>
           </nav>
         </div>
@@ -441,7 +452,7 @@ export default function DemoPage() {
             }`}
           >
             <IconGift className="h-3.5 w-3.5" />
-            <span>Offer rules</span>
+            <span>Rules ({offerRules.filter((r) => r.isActive).length})</span>
           </button>
 
           <button
@@ -464,8 +475,8 @@ export default function DemoPage() {
                 : "bg-white border border-black/[0.06] text-[#52525B]"
             }`}
           >
-            <IconClock className="h-3.5 w-3.5 text-[#D97706]" />
-            <span>Dead Hours & Google</span>
+            <IconSettings className="h-3.5 w-3.5" />
+            <span>Settings</span>
           </button>
 
           <button
@@ -510,7 +521,7 @@ export default function DemoPage() {
                 : activeNav === "retention"
                 ? "Customers to bring back"
                 : activeNav === "settings"
-                ? "Dead Hours & Google Reviews Setup"
+                ? "Restaurant Settings"
                 : activeNav === "customers"
                 ? "Customer Directory"
                 : "Business impact"}
@@ -1233,7 +1244,7 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 3. BRING THEM BACK (WHATSAPP QUEUE WITH DEAD HOURS & GOOGLE BOOST)    */}
+          {/* 3. BRING THEM BACK (WHATSAPP QUEUE)                                   */}
           {/* ===================================================================== */}
           {activeNav === "retention" && (
             <div className="space-y-4">
@@ -1274,7 +1285,6 @@ export default function DemoPage() {
               )}
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 items-start">
-                {/* Left 7 cols: Table */}
                 <div className="lg:col-span-7 rounded-xl bg-white border border-black/[0.06] shadow-xs overflow-hidden">
                   <div className="flex items-center justify-between border-b border-black/[0.06] px-3.5 py-2.5 bg-[#FAFAFA]">
                     <span className="text-[12px] font-bold text-[#0A0A0B]">
@@ -1289,7 +1299,10 @@ export default function DemoPage() {
                       return (
                         <div
                           key={c.id}
-                          onClick={() => setActiveRetentionId(c.id)}
+                          onClick={() => {
+                            setActiveRetentionId(c.id);
+                            setCustomEditedMessage(null);
+                          }}
                           className={`flex items-center justify-between p-3 transition-colors cursor-pointer ${
                             isSelected ? "bg-[#F4F4F5]" : "hover:bg-[#FAFAFA]"
                           }`}
@@ -1337,7 +1350,6 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                {/* Right 5 cols: WhatsApp Composer */}
                 <div className="lg:col-span-5 space-y-3">
                   <div className="rounded-xl bg-white p-4 border border-black/[0.06] shadow-xs">
                     <div className="flex items-center gap-2.5 border-b border-black/[0.06] pb-2.5">
@@ -1354,7 +1366,6 @@ export default function DemoPage() {
                       </div>
                     </div>
 
-                    {/* Objective Mode Switcher */}
                     <div className="mt-3">
                       <p className="text-[10.5px] font-bold text-[#71717A] uppercase tracking-wider mb-1.5">
                         Choose Outreach Objective:
@@ -1406,7 +1417,6 @@ export default function DemoPage() {
                       </div>
                     </div>
 
-                    {/* Active Objective Pill Notice */}
                     {retentionMessageMode === "deadhours" && (
                       <div className="mt-2.5 rounded bg-[#FFFBEB] border border-[#FDE68A] p-2 text-[11px] text-[#92400E]">
                         <p className="font-bold flex items-center gap-1">
@@ -1431,7 +1441,6 @@ export default function DemoPage() {
                       </div>
                     )}
 
-                    {/* Message Box */}
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-1 text-[11.5px]">
                         <span className="font-bold text-[#0A0A0B]">WhatsApp Draft</span>
@@ -1463,161 +1472,322 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 4. SETTINGS & SMART HOURS VIEW (DEAD HOURS & GOOGLE MAPS SETTINGS)     */}
+          {/* 4. DEDICATED SETTINGS PAGE (PROFESSIONAL MULTI-SECTION SETTINGS)      */}
           {/* ===================================================================== */}
           {activeNav === "settings" && (
-            <div className="space-y-5 max-w-[640px]">
-              <div className="border-b border-black/[0.06] pb-3">
-                <h1 className="text-[18px] sm:text-[22px] font-bold tracking-tight text-[#0A0A0B]">
-                  Dead Hours & Google Reviews Setup
-                </h1>
-                <p className="text-[12px] sm:text-[13px] text-[#71717A]">
-                  Configure your slow hours yield management and Google Maps review link.
-                </p>
+            <div className="space-y-5">
+              <div className="border-b border-black/[0.06] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h1 className="text-[18px] sm:text-[22px] font-bold tracking-tight text-[#0A0A0B]">
+                    Restaurant Settings
+                  </h1>
+                  <p className="text-[12px] sm:text-[13px] text-[#71717A]">
+                    Configure your outlet preferences, dead hours yield management, and Google reviews.
+                  </p>
+                </div>
+
+                {settingsSavedNotice && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ECFDF5] px-3 py-1 text-[12px] font-bold text-[#047857] animate-in fade-in">
+                    <IconCheck className="h-4 w-4" />
+                    <span>Settings Saved</span>
+                  </span>
+                )}
               </div>
 
-              {settingsSavedNotice && (
-                <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[12px] font-semibold text-[#047857] flex items-center gap-2">
-                  <IconCheck className="h-4 w-4" />
-                  <span>Settings updated! WhatsApp message drafts have been updated accordingly.</span>
+              {/* Sub-Navigation Tabs */}
+              <div className="flex items-center gap-1.5 border-b border-black/[0.06] pb-2 overflow-x-auto scrollbar-none text-[12px] font-semibold">
+                <button
+                  onClick={() => setSettingsTab("deadhours")}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    settingsTab === "deadhours"
+                      ? "bg-[#0A0A0B] text-white"
+                      : "text-[#52525B] hover:bg-black/5"
+                  }`}
+                >
+                  <IconClock className="h-3.5 w-3.5" />
+                  <span>Dead Hours & Timing</span>
+                </button>
+
+                <button
+                  onClick={() => setSettingsTab("google")}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    settingsTab === "google"
+                      ? "bg-[#0A0A0B] text-white"
+                      : "text-[#52525B] hover:bg-black/5"
+                  }`}
+                >
+                  <IconStar className="h-3.5 w-3.5" />
+                  <span>Google Maps Review</span>
+                </button>
+
+                <button
+                  onClick={() => setSettingsTab("pos")}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    settingsTab === "pos"
+                      ? "bg-[#0A0A0B] text-white"
+                      : "text-[#52525B] hover:bg-black/5"
+                  }`}
+                >
+                  <IconStore className="h-3.5 w-3.5" />
+                  <span>POS & Billing Bridge</span>
+                </button>
+
+                <button
+                  onClick={() => setSettingsTab("whatsapp")}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    settingsTab === "whatsapp"
+                      ? "bg-[#0A0A0B] text-white"
+                      : "text-[#52525B] hover:bg-black/5"
+                  }`}
+                >
+                  <IconWhatsApp className="h-3.5 w-3.5" />
+                  <span>WhatsApp Outreach</span>
+                </button>
+              </div>
+
+              {/* SUBTAB 1: DEAD HOURS & TIMING */}
+              {settingsTab === "deadhours" && (
+                <div className="space-y-4 max-w-[620px]">
+                  <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-[15px] font-bold text-[#0A0A0B]">
+                          Dead Hours Yield Automation
+                        </h3>
+                        <p className="text-[12px] text-[#52525B] mt-0.5 leading-relaxed">
+                          Do not give discounts on Friday night or Sunday brunch when tables are full. Shift win-back rewards to slow afternoon hours to fill empty seats.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          setSettings({ ...settings, deadHoursEnabled: !settings.deadHoursEnabled })
+                        }
+                        className={`text-[11.5px] font-bold px-2.5 py-1 rounded border transition-colors cursor-pointer shrink-0 ${
+                          settings.deadHoursEnabled
+                            ? "border-[#047857]/30 bg-[#ECFDF5] text-[#047857]"
+                            : "border-black/[0.1] bg-[#FAFAFA] text-[#71717A]"
+                        }`}
+                      >
+                        {settings.deadHoursEnabled ? "Active" : "Paused"}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Days</label>
+                        <input
+                          type="text"
+                          value={settings.deadHoursDays}
+                          onChange={(e) =>
+                            setSettings({ ...settings, deadHoursDays: e.target.value })
+                          }
+                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                        />
+                        <p className="text-[10.5px] text-[#71717A] mt-1">e.g. Tuesday – Thursday</p>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Window</label>
+                        <input
+                          type="text"
+                          value={settings.deadHoursTime}
+                          onChange={(e) =>
+                            setSettings({ ...settings, deadHoursTime: e.target.value })
+                          }
+                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                        />
+                        <p className="text-[10.5px] text-[#71717A] mt-1">e.g. 2:00 PM – 6:00 PM</p>
+                      </div>
+                    </div>
+
+                    {/* Protected Weekend Shield */}
+                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
+                      <div className="flex items-center gap-1.5 text-[#0A0A0B] font-bold">
+                        <span>🔒 Weekend Margin Shield</span>
+                        <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px]">Active</span>
+                      </div>
+                      <p className="text-[#52525B]">
+                        Friday 7–11 PM and Sat–Sun all day are strictly protected. No automated discounts are offered for peak weekend dining.
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleSaveSettings}
+                        className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
+                      >
+                        Save Timing Changes
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Card 1: Dead Hours Setting */}
-              <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <IconClock className="h-4 w-4 text-[#D97706]" />
+              {/* SUBTAB 2: GOOGLE MAPS REVIEWS */}
+              {settingsTab === "google" && (
+                <div className="space-y-4 max-w-[620px]">
+                  <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
+                    <div>
                       <h3 className="text-[15px] font-bold text-[#0A0A0B]">
-                        Dead Hours Yield Management
+                        Google Maps Review Booster
                       </h3>
+                      <p className="text-[12px] text-[#52525B] mt-0.5">
+                        In India, a 4.5+ star rating on Google Maps drives over 60% of new walk-in diners. Automatically ask proven regulars to rate you.
+                      </p>
                     </div>
-                    <p className="text-[12px] text-[#52525B] mt-0.5">
-                      Don&apos;t discount busy weekends. Automatically time-shift win-back offers to slow weekday afternoon tables.
-                    </p>
-                  </div>
 
-                  <button
-                    onClick={() => {
-                      setSettings((prev) => ({ ...prev, deadHoursEnabled: !prev.deadHoursEnabled }));
-                      setSettingsSavedNotice(true);
-                      setTimeout(() => setSettingsSavedNotice(false), 3000);
-                    }}
-                    className={`text-[11.5px] font-bold px-2.5 py-1 rounded border transition-colors cursor-pointer ${
-                      settings.deadHoursEnabled
-                        ? "border-[#047857]/30 bg-[#ECFDF5] text-[#047857]"
-                        : "border-black/[0.1] bg-[#FAFAFA] text-[#71717A]"
-                    }`}
-                  >
-                    {settings.deadHoursEnabled ? "Active" : "Paused"}
-                  </button>
-                </div>
+                    <div className="text-[12px] space-y-3">
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">
+                          Google Maps Direct Review Link
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={settings.googleMapsReviewUrl}
+                            onChange={(e) =>
+                              setSettings({ ...settings, googleMapsReviewUrl: e.target.value })
+                            }
+                            className="flex-1 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                          />
+                          <button
+                            onClick={() => window.open(settings.googleMapsReviewUrl, "_blank")}
+                            className="rounded-lg border border-black/[0.1] px-3 py-1.5 font-semibold text-[#52525B] hover:bg-black/5 shrink-0"
+                          >
+                            Test Link ↗
+                          </button>
+                        </div>
+                      </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
-                  <div>
-                    <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Days</label>
-                    <input
-                      type="text"
-                      value={settings.deadHoursDays}
-                      onChange={(e) => setSettings({ ...settings, deadHoursDays: e.target.value })}
-                      placeholder="e.g. Tuesday – Thursday"
-                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                    />
-                  </div>
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">
+                          Auto-Trigger Threshold
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#52525B]">Ask regulars after visit #</span>
+                          <input
+                            type="number"
+                            min="2"
+                            max="10"
+                            value={settings.autoGoogleReviewTriggerVisits}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                autoGoogleReviewTriggerVisits: Number(e.target.value),
+                              })
+                            }
+                            className="w-16 text-center rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1 font-bold text-[#0A0A0B]"
+                          />
+                        </div>
+                        <p className="text-[10.5px] text-[#71717A] mt-1">
+                          Recommendation: 3 visits ensures 98% satisfaction and shields you from 1-star reviews.
+                        </p>
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Window</label>
-                    <input
-                      type="text"
-                      value={settings.deadHoursTime}
-                      onChange={(e) => setSettings({ ...settings, deadHoursTime: e.target.value })}
-                      placeholder="e.g. 2:00 PM – 6:00 PM"
-                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                    />
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-2.5 text-[11.5px] text-[#52525B]">
-                  <p className="font-semibold text-[#0A0A0B]">How this changes WhatsApp outreach:</p>
-                  <p className="mt-0.5 italic">
-                    &quot;We&apos;ve saved ₹100 off your bill this <strong>{settings.deadHoursDays}</strong> between <strong>{settings.deadHoursTime}</strong>...&quot;
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 2: Google Maps Review Link Setting */}
-              <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <IconStar className="h-4 w-4 text-[#2563EB]" />
-                    <h3 className="text-[15px] font-bold text-[#0A0A0B]">
-                      Google Maps Review Booster
-                    </h3>
-                  </div>
-                  <p className="text-[12px] text-[#52525B] mt-0.5">
-                    Collect 5★ ratings from proven regulars without asking customers who had a bad first experience.
-                  </p>
-                </div>
-
-                <div className="text-[12px] space-y-3">
-                  <div>
-                    <label className="font-bold text-[#0A0A0B] block mb-1">
-                      Your Direct Google Maps Review Link
-                    </label>
-                    <input
-                      type="url"
-                      value={settings.googleMapsReviewUrl}
-                      onChange={(e) =>
-                        setSettings({ ...settings, googleMapsReviewUrl: e.target.value })
-                      }
-                      placeholder="https://g.page/r/your-cafe/review"
-                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-[#0A0A0B] block mb-1">
-                      Trigger review request after customer visit #
-                    </label>
-                    <input
-                      type="number"
-                      min="2"
-                      max="10"
-                      value={settings.autoGoogleReviewTriggerVisits}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          autoGoogleReviewTriggerVisits: Number(e.target.value),
-                        })
-                      }
-                      className="w-28 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
-                    />
-                    <p className="text-[11px] text-[#71717A] mt-1">
-                      Recommendation: 3 visits ensures the diner genuinely loves your food.
-                    </p>
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleSaveSettings}
+                        className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
+                      >
+                        Save Google Settings
+                      </button>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-2.5 text-[11.5px] text-[#52525B]">
-                  <p className="font-semibold text-[#0A0A0B]">Review message preview:</p>
-                  <p className="mt-0.5 italic">
-                    &quot;You&apos;ve visited us {settings.autoGoogleReviewTriggerVisits} times now! Could you leave us a quick rating on Google? {settings.googleMapsReviewUrl}&quot;
-                  </p>
-                </div>
+              {/* SUBTAB 3: POS & OUTLET SETUP */}
+              {settingsTab === "pos" && (
+                <div className="space-y-4 max-w-[620px]">
+                  <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
+                    <div>
+                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">Outlet & POS Connection</h3>
+                      <p className="text-[#52525B] mt-0.5">
+                        Revisit works on top of your existing billing machine without POS replacements.
+                      </p>
+                    </div>
 
-                <div className="pt-2 flex justify-end">
-                  <button
-                    onClick={() => {
-                      setSettingsSavedNotice(true);
-                      setTimeout(() => setSettingsSavedNotice(false), 3000);
-                    }}
-                    className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
-                  >
-                    Save Settings
-                  </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">Café Name</label>
+                        <input
+                          type="text"
+                          defaultValue="The Daily Brew"
+                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-[#0A0A0B] block mb-1">Outlet Location</label>
+                        <input
+                          type="text"
+                          defaultValue="100 Ft Road, Indiranagar, Bangalore"
+                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-[#0A0A0B] block mb-1">Current Billing POS Software</label>
+                      <select className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]">
+                        <option>Petpooja (Most popular in India)</option>
+                        <option>Posist / Restroworks</option>
+                        <option>Pine Labs</option>
+                        <option>DotPe</option>
+                        <option>Toast / Square / Local POS</option>
+                      </select>
+                    </div>
+
+                    <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[#065F46]">
+                      <p className="font-bold text-[#047857] flex items-center gap-1.5">
+                        <IconCheck className="h-4 w-4" />
+                        <span>Integration Mode: Receipt Camera OCR (Active)</span>
+                      </p>
+                      <p className="mt-0.5 text-[11px]">
+                        Zero API complexity. The cashier simply takes a 2-second photo of the printed bill.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* SUBTAB 4: WHATSAPP PREFERENCES */}
+              {settingsTab === "whatsapp" && (
+                <div className="space-y-4 max-w-[620px]">
+                  <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
+                    <div>
+                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">WhatsApp Outreach Guardrails</h3>
+                      <p className="text-[#52525B] mt-0.5">
+                        Configure sender rules to prevent customer fatigue and avoid Meta bot fees.
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#0A0A0B]">Delivery Mode</span>
+                        <span className="rounded bg-[#ECFDF5] text-[#047857] font-bold px-2 py-0.5 text-[10.5px]">
+                          Manual Send (wa.me)
+                        </span>
+                      </div>
+                      <p className="text-[#52525B] text-[11.5px]">
+                        Messages arrive directly from your café owner / counter number. Zero per-message utility fees, zero Meta template approval delays.
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#0A0A0B]">Anti-Spam Frequency Cap</span>
+                        <span className="font-bold text-[#0A0A0B]">Max 1 per 14 days</span>
+                      </div>
+                      <p className="text-[#52525B] text-[11.5px]">
+                        Revisit ensures you never message the same customer more than once in a 2-week window.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
