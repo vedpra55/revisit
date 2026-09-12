@@ -1,4 +1,4 @@
-import { Customer, BillItem, OfferRule } from "./types";
+import { Customer, BillItem, OfferRule, CafeSettings } from "./types";
 
 export const INITIAL_CUSTOMERS: Customer[] = [
   {
@@ -172,4 +172,13 @@ export const INITIAL_OFFER_RULES: OfferRule[] = [
     description: "Give ₹50 OFF if a new customer hasn't returned within 10 days",
   },
 ];
+
+export const DEFAULT_CAFE_SETTINGS: CafeSettings = {
+  deadHoursEnabled: true,
+  deadHoursDays: "Tuesday – Thursday",
+  deadHoursTime: "2:00 PM – 6:00 PM",
+  googleMapsReviewUrl: "https://g.page/r/the-daily-brew-indiranagar/review",
+  autoGoogleReviewTriggerVisits: 3,
+};
+
 

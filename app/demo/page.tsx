@@ -11,19 +11,23 @@ import {
   IconCamera,
   IconUsers,
   IconTrendingUp,
+  IconClock,
+  IconStar,
 } from "../components/Icons";
-import { Customer, OfferRule, TriggerType, RewardType } from "./types";
-import { INITIAL_CUSTOMERS, INITIAL_OFFER_RULES } from "./mockData";
+import { Customer, OfferRule, TriggerType, RewardType, CafeSettings } from "./types";
+import { INITIAL_CUSTOMERS, INITIAL_OFFER_RULES, DEFAULT_CAFE_SETTINGS } from "./mockData";
 
 export default function DemoPage() {
-  // Navigation: 'counter' | 'rules' | 'retention' | 'customers' | 'impact'
+  // Navigation: 'counter' | 'rules' | 'retention' | 'customers' | 'impact' | 'settings'
   const [activeNav, setActiveNav] = useState<
-    "counter" | "rules" | "retention" | "customers" | "impact"
+    "counter" | "rules" | "retention" | "customers" | "impact" | "settings"
   >("counter");
 
   // Global demo state
   const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
   const [offerRules, setOfferRules] = useState<OfferRule[]>(INITIAL_OFFER_RULES);
+  const [settings, setSettings] = useState<CafeSettings>(DEFAULT_CAFE_SETTINGS);
+  const [settingsSavedNotice, setSettingsSavedNotice] = useState<boolean>(false);
 
   // Counter step-by-step state: 1 (phone) -> 2 (reward) -> 3 (camera/OCR) -> 4 (saved)
   const [counterStep, setCounterStep] = useState<1 | 2 | 3 | 4>(1);
@@ -46,9 +50,10 @@ export default function DemoPage() {
 
   // Retention tab state
   const [activeRetentionId, setActiveRetentionId] = useState<string>("c1");
-  const [retentionMessage, setRetentionMessage] = useState<string>(
-    INITIAL_CUSTOMERS[0].defaultMessage
+  const [retentionMessageMode, setRetentionMessageMode] = useState<"deadhours" | "review" | "standard">(
+    "deadhours"
   );
+  const [customEditedMessage, setCustomEditedMessage] = useState<string | null>(null);
   const [simulatedReturnNotice, setSimulatedReturnNotice] = useState<string | null>(null);
 
   // Active customer in Counter
@@ -83,6 +88,22 @@ export default function DemoPage() {
   const activeRetentionCustomer = useMemo(() => {
     return customers.find((c) => c.id === activeRetentionId) || customers[0];
   }, [customers, activeRetentionId]);
+
+  // Compute dynamic retention message during render
+  const computedDefaultMessage = useMemo(() => {
+    const c = activeRetentionCustomer;
+    const firstName = c.name.split(" ")[0];
+
+    if (retentionMessageMode === "deadhours" && settings.deadHoursEnabled) {
+      return `Hey ${firstName} 👋 Missing your ${c.favoriteItem}? We've saved ₹100 off your bill this ${settings.deadHoursDays} between ${settings.deadHoursTime} at The Daily Brew. Perfect for a relaxed work session!`;
+    } else if (retentionMessageMode === "review") {
+      return `Hey ${firstName}! You've visited us ${c.visits} times now and you're officially one of our top regulars ❤️ Could you take 10 seconds to leave us a quick rating on Google? Here's our direct link: ${settings.googleMapsReviewUrl}. It means the world to our small team!`;
+    } else {
+      return `Hi ${firstName},\n\nYour usual ${c.favoriteItem} is waiting! Here's ₹100 off your next visit this week at The Daily Brew.\n\nHope to see you soon!`;
+    }
+  }, [activeRetentionCustomer, retentionMessageMode, settings]);
+
+  const retentionMessage = customEditedMessage ?? computedDefaultMessage;
 
   // Keypad click handler for Counter
   const handleKeypadPress = (val: string) => {
@@ -235,6 +256,7 @@ export default function DemoPage() {
   const handleFullReset = () => {
     setCustomers(INITIAL_CUSTOMERS);
     setOfferRules(INITIAL_OFFER_RULES);
+    setSettings(DEFAULT_CAFE_SETTINGS);
     setPhoneInput("+91 98765 43210");
     setSelectedCustomerId("c1");
     setCounterStep(1);
@@ -242,14 +264,14 @@ export default function DemoPage() {
     setIsCapturing(false);
     setIsRewardAppliedInPos(true);
     setActiveRetentionId("c1");
-    setRetentionMessage(INITIAL_CUSTOMERS[0].defaultMessage);
+    setRetentionMessageMode("deadhours");
     setSimulatedReturnNotice(null);
   };
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#0A0A0B] flex flex-col md:flex-row selection:bg-[#0A0A0B] selection:text-white font-sans">
       {/* ========================================================================= */}
-      {/* 1. DESKTOP SIDEBAR (HIDDEN ON MOBILE)                                     */}
+      {/* 1. DESKTOP SIDEBAR                                                        */}
       {/* ========================================================================= */}
       <aside className="hidden md:flex md:w-[220px] shrink-0 border-r border-black/[0.06] bg-white flex-col justify-between p-4 md:min-h-screen sticky top-0 h-screen">
         <div>
@@ -323,6 +345,18 @@ export default function DemoPage() {
             </button>
 
             <button
+              onClick={() => setActiveNav("settings")}
+              className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-left cursor-pointer ${
+                activeNav === "settings"
+                  ? "bg-[#0A0A0B] text-white font-semibold shadow-xs"
+                  : "text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#0A0A0B]"
+              }`}
+            >
+              <IconClock className="h-4 w-4 shrink-0 text-[#D97706]" />
+              <span>Dead Hours & Google</span>
+            </button>
+
+            <button
               onClick={() => setActiveNav("customers")}
               className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-left cursor-pointer ${
                 activeNav === "customers"
@@ -363,7 +397,7 @@ export default function DemoPage() {
       </aside>
 
       {/* ========================================================================= */}
-      {/* 2. MOBILE TOP NAVIGATION & COMPACT PILL BAR                               */}
+      {/* 2. MOBILE TOP NAVIGATION & HORIZONTAL PILL BAR                            */}
       {/* ========================================================================= */}
       <div className="md:hidden border-b border-black/[0.06] bg-white sticky top-0 z-40">
         <div className="px-3.5 py-2.5 flex items-center justify-between">
@@ -385,7 +419,6 @@ export default function DemoPage() {
           </div>
         </div>
 
-        {/* Horizontal Scrollable Tabs */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto border-t border-black/[0.04] scrollbar-none bg-[#FAFAFA]">
           <button
             onClick={() => setActiveNav("counter")}
@@ -408,7 +441,7 @@ export default function DemoPage() {
             }`}
           >
             <IconGift className="h-3.5 w-3.5" />
-            <span>Offer rules ({offerRules.filter((r) => r.isActive).length})</span>
+            <span>Offer rules</span>
           </button>
 
           <button
@@ -421,6 +454,18 @@ export default function DemoPage() {
           >
             <IconWhatsApp className="h-3.5 w-3.5 text-[#16A34A]" />
             <span>Bring back</span>
+          </button>
+
+          <button
+            onClick={() => setActiveNav("settings")}
+            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
+              activeNav === "settings"
+                ? "bg-[#0A0A0B] text-white font-semibold"
+                : "bg-white border border-black/[0.06] text-[#52525B]"
+            }`}
+          >
+            <IconClock className="h-3.5 w-3.5 text-[#D97706]" />
+            <span>Dead Hours & Google</span>
           </button>
 
           <button
@@ -453,7 +498,6 @@ export default function DemoPage() {
       {/* 3. MAIN WORKSPACE CONTAINER                                               */}
       {/* ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Desktop Breadcrumb Bar */}
         <header className="hidden md:flex border-b border-black/[0.06] bg-white/80 backdrop-blur-md px-6 py-2.5 items-center justify-between text-[12.5px]">
           <div className="flex items-center gap-2">
             <span className="text-[#71717A]">Demo</span>
@@ -465,6 +509,8 @@ export default function DemoPage() {
                 ? "Offer rules"
                 : activeNav === "retention"
                 ? "Customers to bring back"
+                : activeNav === "settings"
+                ? "Dead Hours & Google Reviews Setup"
                 : activeNav === "customers"
                 ? "Customer Directory"
                 : "Business impact"}
@@ -479,14 +525,12 @@ export default function DemoPage() {
           </Link>
         </header>
 
-        {/* View Router */}
         <main className="flex-1 p-3 sm:p-6 md:p-8 max-w-[1000px] w-full mx-auto">
           {/* ===================================================================== */}
           {/* 1. AT THE COUNTER VIEW                                                */}
           {/* ===================================================================== */}
           {activeNav === "counter" && (
             <div className="mx-auto max-w-[620px]">
-              {/* Step indicator */}
               <div className="mb-4 sm:mb-5 flex items-center justify-between border-b border-black/[0.06] pb-2.5">
                 <div className="flex items-center gap-1.5 sm:gap-2 text-[11.5px] sm:text-[12.5px] font-semibold">
                   <span
@@ -605,7 +649,7 @@ export default function DemoPage() {
                 </div>
               )}
 
-              {/* Step 2: Instant Rule Recognition */}
+              {/* Step 2: Recognition */}
               {counterStep === 2 && (
                 <div className="rounded-xl sm:rounded-2xl bg-white p-4 sm:p-6 border border-black/[0.06] shadow-xs">
                   <div>
@@ -671,7 +715,6 @@ export default function DemoPage() {
                     </div>
                   </div>
 
-                  {/* Reward Card */}
                   <div className="mt-4 rounded-lg sm:rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-4">
                     <div className="flex items-start justify-between">
                       <div>
@@ -749,7 +792,6 @@ export default function DemoPage() {
                     </span>
                   </div>
 
-                  {/* Viewfinder */}
                   <div className="mt-4 relative rounded-xl bg-[#18181B] p-3 sm:p-5 text-white overflow-hidden shadow-inner">
                     <div className="absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t-2 border-l-2 border-white/60" />
                     <div className="absolute top-2.5 right-2.5 h-3.5 w-3.5 border-t-2 border-r-2 border-white/60" />
@@ -760,7 +802,6 @@ export default function DemoPage() {
                       <div className="absolute inset-x-0 top-0 h-1 bg-[#22C55E] shadow-[0_0_15px_#22C55E] animate-bounce z-20" />
                     )}
 
-                    {/* Compact Receipt Mock */}
                     <div className="mx-auto max-w-[270px] sm:max-w-[300px] rounded-lg bg-white p-3 sm:p-4 text-[#0A0A0B] shadow-2xl font-mono text-[11px] sm:text-[11.5px]">
                       <div className="text-center border-b border-dashed border-black/20 pb-2">
                         <p className="font-bold text-[12.5px] font-sans">THE DAILY BREW</p>
@@ -795,7 +836,6 @@ export default function DemoPage() {
                       </div>
                     </div>
 
-                    {/* Camera Button */}
                     <div className="mt-4 flex items-center justify-between pt-1">
                       <div className="flex items-center gap-1.5 text-[11px] text-white/70">
                         <span
@@ -827,7 +867,6 @@ export default function DemoPage() {
                     </div>
                   </div>
 
-                  {/* OCR Parsed Card */}
                   {ocrCompleted && (
                     <div className="mt-3.5 rounded-lg sm:rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] p-3 text-[#166534]">
                       <div className="flex items-center justify-between text-[12px] font-bold">
@@ -934,7 +973,7 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 2. OFFER RULES ENGINE VIEW                                            */}
+          {/* 2. OFFER RULES VIEW                                                   */}
           {/* ===================================================================== */}
           {activeNav === "rules" && (
             <div className="space-y-4">
@@ -956,7 +995,6 @@ export default function DemoPage() {
                 </button>
               </div>
 
-              {/* Rules Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {offerRules.map((rule) => {
                   const matchingCustomersCount = customers.filter((c) => {
@@ -1195,7 +1233,7 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 3. BRING THEM BACK (DAILY WHATSAPP QUEUE)                             */}
+          {/* 3. BRING THEM BACK (WHATSAPP QUEUE WITH DEAD HOURS & GOOGLE BOOST)    */}
           {/* ===================================================================== */}
           {activeNav === "retention" && (
             <div className="space-y-4">
@@ -1251,10 +1289,7 @@ export default function DemoPage() {
                       return (
                         <div
                           key={c.id}
-                          onClick={() => {
-                            setActiveRetentionId(c.id);
-                            setRetentionMessage(c.defaultMessage);
-                          }}
+                          onClick={() => setActiveRetentionId(c.id)}
                           className={`flex items-center justify-between p-3 transition-colors cursor-pointer ${
                             isSelected ? "bg-[#F4F4F5]" : "hover:bg-[#FAFAFA]"
                           }`}
@@ -1319,34 +1354,97 @@ export default function DemoPage() {
                       </div>
                     </div>
 
-                    <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-center text-[11px] bg-[#FAFAFA] rounded p-2">
-                      <div>
-                        <p className="tabular font-bold text-[#0A0A0B]">{activeRetentionCustomer.visits}</p>
-                        <p className="text-[#71717A] text-[10px]">visits</p>
-                      </div>
-                      <div>
-                        <p className="tabular font-bold text-[#0A0A0B]">₹{activeRetentionCustomer.totalSpent}</p>
-                        <p className="text-[#71717A] text-[10px]">spent</p>
-                      </div>
-                      <div>
-                        <p className="tabular font-bold text-[#0A0A0B]">Every {activeRetentionCustomer.usualGapDays}d</p>
-                        <p className="text-[#71717A] text-[10px]">gap</p>
+                    {/* Objective Mode Switcher */}
+                    <div className="mt-3">
+                      <p className="text-[10.5px] font-bold text-[#71717A] uppercase tracking-wider mb-1.5">
+                        Choose Outreach Objective:
+                      </p>
+                      <div className="flex gap-1.5 flex-wrap text-[11px]">
+                        <button
+                          onClick={() => {
+                            setRetentionMessageMode("deadhours");
+                            setCustomEditedMessage(null);
+                          }}
+                          className={`rounded px-2.5 py-1 font-semibold transition-all cursor-pointer flex items-center gap-1 ${
+                            retentionMessageMode === "deadhours"
+                              ? "bg-[#D97706] text-white"
+                              : "bg-[#FAFAFA] border border-black/[0.08] text-[#52525B] hover:bg-black/5"
+                          }`}
+                        >
+                          <IconClock className="h-3 w-3" />
+                          <span>Dead Hours Deal</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setRetentionMessageMode("review");
+                            setCustomEditedMessage(null);
+                          }}
+                          className={`rounded px-2.5 py-1 font-semibold transition-all cursor-pointer flex items-center gap-1 ${
+                            retentionMessageMode === "review"
+                              ? "bg-[#2563EB] text-white"
+                              : "bg-[#FAFAFA] border border-black/[0.08] text-[#52525B] hover:bg-black/5"
+                          }`}
+                        >
+                          <IconStar className="h-3 w-3" />
+                          <span>Google Rating Booster</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setRetentionMessageMode("standard");
+                            setCustomEditedMessage(null);
+                          }}
+                          className={`rounded px-2.5 py-1 font-semibold transition-all cursor-pointer ${
+                            retentionMessageMode === "standard"
+                              ? "bg-[#0A0A0B] text-white"
+                              : "bg-[#FAFAFA] border border-black/[0.08] text-[#52525B] hover:bg-black/5"
+                          }`}
+                        >
+                          Standard Win-back
+                        </button>
                       </div>
                     </div>
 
+                    {/* Active Objective Pill Notice */}
+                    {retentionMessageMode === "deadhours" && (
+                      <div className="mt-2.5 rounded bg-[#FFFBEB] border border-[#FDE68A] p-2 text-[11px] text-[#92400E]">
+                        <p className="font-bold flex items-center gap-1">
+                          <IconClock className="h-3 w-3 text-[#D97706]" />
+                          Smart Timing: {settings.deadHoursDays} · {settings.deadHoursTime}
+                        </p>
+                        <p className="opacity-90 mt-0.5">
+                          Protects busy weekend table revenue by driving regular visits to slow afternoon hours.
+                        </p>
+                      </div>
+                    )}
+
+                    {retentionMessageMode === "review" && (
+                      <div className="mt-2.5 rounded bg-[#EFF6FF] border border-[#BFDBFE] p-2 text-[11px] text-[#1E40AF]">
+                        <p className="font-bold flex items-center gap-1">
+                          <IconStar className="h-3 w-3 text-[#2563EB]" />
+                          Google Maps Review Booster (Visit #{activeRetentionCustomer.visits} Regular)
+                        </p>
+                        <p className="opacity-90 mt-0.5">
+                          Pre-fills direct review URL: {settings.googleMapsReviewUrl}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Message Box */}
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-1 text-[11.5px]">
-                        <span className="font-bold text-[#0A0A0B]">WhatsApp Note</span>
-                        <span className="text-[#16A34A] font-medium flex items-center gap-1">
+                        <span className="font-bold text-[#0A0A0B]">WhatsApp Draft</span>
+                        <span className="text-[#16A34A] font-semibold flex items-center gap-1">
                           <IconWhatsApp className="h-3 w-3" />
-                          Manual Send
+                          1-Tap Send
                         </span>
                       </div>
 
                       <textarea
-                        rows={4}
+                        rows={5}
                         value={retentionMessage}
-                        onChange={(e) => setRetentionMessage(e.target.value)}
+                        onChange={(e) => setCustomEditedMessage(e.target.value)}
                         className="w-full rounded-lg border border-black/[0.08] bg-[#FAFAFA] p-2.5 text-[12px] font-medium text-[#0A0A0B] focus:border-[#0A0A0B] focus:bg-white focus:outline-none transition-colors leading-relaxed"
                       />
 
@@ -1365,7 +1463,166 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 4. CUSTOMERS DIRECTORY VIEW                                           */}
+          {/* 4. SETTINGS & SMART HOURS VIEW (DEAD HOURS & GOOGLE MAPS SETTINGS)     */}
+          {/* ===================================================================== */}
+          {activeNav === "settings" && (
+            <div className="space-y-5 max-w-[640px]">
+              <div className="border-b border-black/[0.06] pb-3">
+                <h1 className="text-[18px] sm:text-[22px] font-bold tracking-tight text-[#0A0A0B]">
+                  Dead Hours & Google Reviews Setup
+                </h1>
+                <p className="text-[12px] sm:text-[13px] text-[#71717A]">
+                  Configure your slow hours yield management and Google Maps review link.
+                </p>
+              </div>
+
+              {settingsSavedNotice && (
+                <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[12px] font-semibold text-[#047857] flex items-center gap-2">
+                  <IconCheck className="h-4 w-4" />
+                  <span>Settings updated! WhatsApp message drafts have been updated accordingly.</span>
+                </div>
+              )}
+
+              {/* Card 1: Dead Hours Setting */}
+              <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <IconClock className="h-4 w-4 text-[#D97706]" />
+                      <h3 className="text-[15px] font-bold text-[#0A0A0B]">
+                        Dead Hours Yield Management
+                      </h3>
+                    </div>
+                    <p className="text-[12px] text-[#52525B] mt-0.5">
+                      Don&apos;t discount busy weekends. Automatically time-shift win-back offers to slow weekday afternoon tables.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setSettings((prev) => ({ ...prev, deadHoursEnabled: !prev.deadHoursEnabled }));
+                      setSettingsSavedNotice(true);
+                      setTimeout(() => setSettingsSavedNotice(false), 3000);
+                    }}
+                    className={`text-[11.5px] font-bold px-2.5 py-1 rounded border transition-colors cursor-pointer ${
+                      settings.deadHoursEnabled
+                        ? "border-[#047857]/30 bg-[#ECFDF5] text-[#047857]"
+                        : "border-black/[0.1] bg-[#FAFAFA] text-[#71717A]"
+                    }`}
+                  >
+                    {settings.deadHoursEnabled ? "Active" : "Paused"}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+                  <div>
+                    <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Days</label>
+                    <input
+                      type="text"
+                      value={settings.deadHoursDays}
+                      onChange={(e) => setSettings({ ...settings, deadHoursDays: e.target.value })}
+                      placeholder="e.g. Tuesday – Thursday"
+                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Window</label>
+                    <input
+                      type="text"
+                      value={settings.deadHoursTime}
+                      onChange={(e) => setSettings({ ...settings, deadHoursTime: e.target.value })}
+                      placeholder="e.g. 2:00 PM – 6:00 PM"
+                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-2.5 text-[11.5px] text-[#52525B]">
+                  <p className="font-semibold text-[#0A0A0B]">How this changes WhatsApp outreach:</p>
+                  <p className="mt-0.5 italic">
+                    &quot;We&apos;ve saved ₹100 off your bill this <strong>{settings.deadHoursDays}</strong> between <strong>{settings.deadHoursTime}</strong>...&quot;
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 2: Google Maps Review Link Setting */}
+              <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <IconStar className="h-4 w-4 text-[#2563EB]" />
+                    <h3 className="text-[15px] font-bold text-[#0A0A0B]">
+                      Google Maps Review Booster
+                    </h3>
+                  </div>
+                  <p className="text-[12px] text-[#52525B] mt-0.5">
+                    Collect 5★ ratings from proven regulars without asking customers who had a bad first experience.
+                  </p>
+                </div>
+
+                <div className="text-[12px] space-y-3">
+                  <div>
+                    <label className="font-bold text-[#0A0A0B] block mb-1">
+                      Your Direct Google Maps Review Link
+                    </label>
+                    <input
+                      type="url"
+                      value={settings.googleMapsReviewUrl}
+                      onChange={(e) =>
+                        setSettings({ ...settings, googleMapsReviewUrl: e.target.value })
+                      }
+                      placeholder="https://g.page/r/your-cafe/review"
+                      className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#0A0A0B] block mb-1">
+                      Trigger review request after customer visit #
+                    </label>
+                    <input
+                      type="number"
+                      min="2"
+                      max="10"
+                      value={settings.autoGoogleReviewTriggerVisits}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          autoGoogleReviewTriggerVisits: Number(e.target.value),
+                        })
+                      }
+                      className="w-28 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                    />
+                    <p className="text-[11px] text-[#71717A] mt-1">
+                      Recommendation: 3 visits ensures the diner genuinely loves your food.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-2.5 text-[11.5px] text-[#52525B]">
+                  <p className="font-semibold text-[#0A0A0B]">Review message preview:</p>
+                  <p className="mt-0.5 italic">
+                    &quot;You&apos;ve visited us {settings.autoGoogleReviewTriggerVisits} times now! Could you leave us a quick rating on Google? {settings.googleMapsReviewUrl}&quot;
+                  </p>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    onClick={() => {
+                      setSettingsSavedNotice(true);
+                      setTimeout(() => setSettingsSavedNotice(false), 3000);
+                    }}
+                    className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
+                  >
+                    Save Settings
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===================================================================== */}
+          {/* 5. CUSTOMERS DIRECTORY VIEW                                           */}
           {/* ===================================================================== */}
           {activeNav === "customers" && (
             <div className="space-y-4">
@@ -1434,7 +1691,7 @@ export default function DemoPage() {
           )}
 
           {/* ===================================================================== */}
-          {/* 5. BUSINESS IMPACT & ATTRIBUTION                                      */}
+          {/* 6. BUSINESS IMPACT & ATTRIBUTION                                      */}
           {/* ===================================================================== */}
           {activeNav === "impact" && (
             <div className="space-y-4">

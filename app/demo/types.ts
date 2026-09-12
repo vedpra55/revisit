@@ -47,3 +47,11 @@ export interface OfferRule {
   description: string;
 }
 
+export interface CafeSettings {
+  deadHoursEnabled: boolean;
+  deadHoursDays: string;
+  deadHoursTime: string;
+  googleMapsReviewUrl: string;
+  autoGoogleReviewTriggerVisits: number;
+}
+
