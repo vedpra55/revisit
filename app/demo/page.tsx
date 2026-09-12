@@ -419,102 +419,33 @@ export default function DemoPage() {
       </aside>
 
       {/* ========================================================================= */}
-      {/* 2. MOBILE TOP NAVIGATION & HORIZONTAL PILL BAR                            */}
+      {/* 2. MOBILE APP HEADER (CLEAN NATIVE APP TOP BAR)                           */}
       {/* ========================================================================= */}
-      <div className="md:hidden border-b border-black/[0.06] bg-white sticky top-0 z-40">
-        <div className="px-3.5 py-2.5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-[15px] font-bold text-[#0A0A0B]">
+      <header className="md:hidden border-b border-black/[0.06] bg-white sticky top-0 z-40 px-3.5 py-2.5 flex items-center justify-between shadow-2xs">
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
             <IconLogo className="h-5 w-5" />
-            <span>revisit</span>
+            <span className="text-[15px] font-bold tracking-tight text-[#0A0A0B]">revisit</span>
           </Link>
-
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium text-[#71717A] bg-[#FAFAFA] px-2 py-0.5 rounded border border-black/[0.06]">
-              The Daily Brew
-            </span>
-            <button
-              onClick={handleFullReset}
-              className="text-[11px] font-medium text-[#71717A] hover:text-[#0A0A0B] underline px-1"
-            >
-              Reset
-            </button>
+          <span className="text-[#D4D4D8] text-[12px]">/</span>
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="text-[11.5px] font-bold text-[#0A0A0B]">The Daily Brew</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto border-t border-black/[0.04] scrollbar-none bg-[#FAFAFA]">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-bold text-[#047857] bg-[#ECFDF5] px-2 py-0.5 rounded-full border border-[#A7F3D0]/70">
+            POS Active
+          </span>
           <button
-            onClick={() => setActiveNav("counter")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "counter"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
+            onClick={handleFullReset}
+            className="text-[10.5px] font-semibold text-[#71717A] hover:text-[#0A0A0B] bg-[#FAFAFA] border border-black/[0.08] px-2 py-0.5 rounded-md active:scale-95 transition-all cursor-pointer"
           >
-            <IconCamera className="h-3.5 w-3.5" />
-            <span>Counter</span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("rules")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "rules"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
-          >
-            <IconGift className="h-3.5 w-3.5" />
-            <span>Rules ({offerRules.filter((r) => r.isActive).length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("retention")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "retention"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
-          >
-            <IconWhatsApp className="h-3.5 w-3.5 text-[#16A34A]" />
-            <span>Bring back</span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("settings")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "settings"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
-          >
-            <IconSettings className="h-3.5 w-3.5" />
-            <span>Settings</span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("customers")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "customers"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
-          >
-            <IconUsers className="h-3.5 w-3.5" />
-            <span>Customers</span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("impact")}
-            className={`shrink-0 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-all ${
-              activeNav === "impact"
-                ? "bg-[#0A0A0B] text-white font-semibold"
-                : "bg-white border border-black/[0.06] text-[#52525B]"
-            }`}
-          >
-            <IconTrendingUp className="h-3.5 w-3.5" />
-            <span>Impact</span>
+            Reset
           </button>
         </div>
-      </div>
+      </header>
 
       {/* ========================================================================= */}
       {/* 3. MAIN WORKSPACE CONTAINER                                               */}
@@ -547,7 +478,7 @@ export default function DemoPage() {
           </Link>
         </header>
 
-        <main className="flex-1 p-3 sm:p-6 md:p-8 max-w-[1000px] w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-6 md:p-8 max-w-[1000px] w-full mx-auto pb-28 sm:pb-24 md:pb-8">
           {/* ===================================================================== */}
           {/* 1. AT THE COUNTER VIEW                                                */}
           {/* ===================================================================== */}
@@ -2100,6 +2031,187 @@ export default function DemoPage() {
           )}
         </main>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 4. MOBILE APP BOTTOM NAVIGATION BAR (PURE REAL APP VIEW)                  */}
+      {/* ========================================================================= */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-black/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] px-1 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
+        <div className="grid grid-cols-6 max-w-md mx-auto items-center">
+          {/* 1. Counter */}
+          <button
+            onClick={() => setActiveNav("counter")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "counter"
+                ? "text-[#0A0A0B]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "counter" ? "scale-110" : ""
+              }`}
+            >
+              <IconCamera className="h-5 w-5" />
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "counter" ? "font-bold text-[#0A0A0B]" : "font-medium"
+              }`}
+            >
+              Counter
+            </span>
+            {activeNav === "counter" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#0A0A0B]" />
+            )}
+          </button>
+
+          {/* 2. Offer Rules */}
+          <button
+            onClick={() => setActiveNav("rules")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "rules"
+                ? "text-[#0A0A0B]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`relative flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "rules" ? "scale-110" : ""
+              }`}
+            >
+              <IconGift className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 px-0.5 items-center justify-center rounded-full bg-[#0A0A0B] text-white text-[8px] font-bold">
+                {offerRules.filter((r) => r.isActive).length}
+              </span>
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "rules" ? "font-bold text-[#0A0A0B]" : "font-medium"
+              }`}
+            >
+              Rules
+            </span>
+            {activeNav === "rules" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#0A0A0B]" />
+            )}
+          </button>
+
+          {/* 3. Bring Them Back */}
+          <button
+            onClick={() => setActiveNav("retention")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "retention"
+                ? "text-[#16A34A]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`relative flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "retention" ? "scale-110" : ""
+              }`}
+            >
+              <IconWhatsApp className="h-5 w-5 text-[#16A34A]" />
+              {customers.some((c) => c.isOverdue && !c.returned) && (
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#EF4444] ring-2 ring-white animate-pulse" />
+              )}
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "retention" ? "font-bold text-[#16A34A]" : "font-medium"
+              }`}
+            >
+              Outreach
+            </span>
+            {activeNav === "retention" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#16A34A]" />
+            )}
+          </button>
+
+          {/* 4. Customers */}
+          <button
+            onClick={() => setActiveNav("customers")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "customers"
+                ? "text-[#0A0A0B]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "customers" ? "scale-110" : ""
+              }`}
+            >
+              <IconUsers className="h-5 w-5" />
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "customers" ? "font-bold text-[#0A0A0B]" : "font-medium"
+              }`}
+            >
+              Guests
+            </span>
+            {activeNav === "customers" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#0A0A0B]" />
+            )}
+          </button>
+
+          {/* 5. Impact */}
+          <button
+            onClick={() => setActiveNav("impact")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "impact"
+                ? "text-[#0A0A0B]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "impact" ? "scale-110" : ""
+              }`}
+            >
+              <IconTrendingUp className="h-5 w-5" />
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "impact" ? "font-bold text-[#0A0A0B]" : "font-medium"
+              }`}
+            >
+              Impact
+            </span>
+            {activeNav === "impact" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#0A0A0B]" />
+            )}
+          </button>
+
+          {/* 6. Settings */}
+          <button
+            onClick={() => setActiveNav("settings")}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer relative ${
+              activeNav === "settings"
+                ? "text-[#0A0A0B]"
+                : "text-[#71717A] hover:text-[#0A0A0B]"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-center h-6 w-6 transition-transform ${
+                activeNav === "settings" ? "scale-110" : ""
+              }`}
+            >
+              <IconSettings className="h-5 w-5" />
+            </div>
+            <span
+              className={`text-[9.5px] tracking-tight mt-0.5 ${
+                activeNav === "settings" ? "font-bold text-[#0A0A0B]" : "font-medium"
+              }`}
+            >
+              Settings
+            </span>
+            {activeNav === "settings" && (
+              <span className="absolute bottom-0 h-0.5 w-4 rounded-full bg-[#0A0A0B]" />
+            )}
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }
