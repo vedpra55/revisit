@@ -1556,17 +1556,23 @@ export default function DemoPage() {
               {/* SUBTAB 1: DEAD HOURS & TIMING */}
               {settingsTab === "deadhours" && (
                 <div className="space-y-4 max-w-[620px]">
+                  {/* Main Settings Card */}
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
-                        Dead Hours Yield Automation
-                      </h3>
+                      <div>
+                        <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
+                          Dead Hours Yield Automation
+                        </h3>
+                        <p className="text-[12px] text-[#71717A]">
+                          Route retention offers strictly to slow weekday shifts.
+                        </p>
+                      </div>
 
                       <button
                         onClick={() =>
                           setSettings({ ...settings, deadHoursEnabled: !settings.deadHoursEnabled })
                         }
-                        className={`text-[11.5px] font-bold px-2.5 py-1 rounded border transition-colors cursor-pointer shrink-0 ${
+                        className={`text-[11.5px] font-bold px-3 py-1 rounded-lg border transition-colors cursor-pointer shrink-0 ${
                           settings.deadHoursEnabled
                             ? "border-[#047857]/30 bg-[#ECFDF5] text-[#047857]"
                             : "border-black/[0.1] bg-[#FAFAFA] text-[#71717A]"
@@ -1576,15 +1582,17 @@ export default function DemoPage() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Days</label>
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">
+                          Downtime Days
+                        </label>
                         <select
                           value={settings.deadHoursDays}
                           onChange={(e) =>
                             setSettings({ ...settings, deadHoursDays: e.target.value })
                           }
-                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-2 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                          className="h-10 w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 font-medium text-[#0A0A0B] text-[12.5px] focus:outline-none focus:border-[#0A0A0B] focus:bg-white transition-colors cursor-pointer"
                         >
                           <option value="Tuesday – Thursday">Tuesday – Thursday (Midweek)</option>
                           <option value="Monday – Thursday">Monday – Thursday</option>
@@ -1595,64 +1603,99 @@ export default function DemoPage() {
                       </div>
 
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">Downtime Window</label>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          <div>
-                            <span className="text-[10.5px] text-[#71717A] block mb-0.5">From</span>
-                            <input
-                              type="time"
-                              value={settings.deadHoursStartTime}
-                              onChange={(e) => {
-                                const newStart = e.target.value;
-                                const formatted = `${formatTime12h(newStart)} – ${formatTime12h(settings.deadHoursEndTime)}`;
-                                setSettings({
-                                  ...settings,
-                                  deadHoursStartTime: newStart,
-                                  deadHoursTime: formatted,
-                                });
-                              }}
-                              className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1.5 font-medium text-[#0A0A0B] text-[12px] focus:outline-none focus:border-[#0A0A0B]"
-                            />
-                          </div>
-                          <div>
-                            <span className="text-[10.5px] text-[#71717A] block mb-0.5">To</span>
-                            <input
-                              type="time"
-                              value={settings.deadHoursEndTime}
-                              onChange={(e) => {
-                                const newEnd = e.target.value;
-                                const formatted = `${formatTime12h(settings.deadHoursStartTime)} – ${formatTime12h(newEnd)}`;
-                                setSettings({
-                                  ...settings,
-                                  deadHoursEndTime: newEnd,
-                                  deadHoursTime: formatted,
-                                });
-                              }}
-                              className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1.5 font-medium text-[#0A0A0B] text-[12px] focus:outline-none focus:border-[#0A0A0B]"
-                            />
-                          </div>
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">
+                          Downtime Window
+                        </label>
+                        <div className="flex items-center gap-2 h-10">
+                          <input
+                            type="time"
+                            value={settings.deadHoursStartTime}
+                            onChange={(e) => {
+                              const newStart = e.target.value;
+                              const formatted = `${formatTime12h(newStart)} – ${formatTime12h(settings.deadHoursEndTime)}`;
+                              setSettings({
+                                ...settings,
+                                deadHoursStartTime: newStart,
+                                deadHoursTime: formatted,
+                              });
+                            }}
+                            className="h-10 flex-1 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2.5 font-medium text-[#0A0A0B] text-[12.5px] focus:outline-none focus:border-[#0A0A0B] focus:bg-white transition-colors"
+                          />
+                          <span className="text-[#A1A1AA] text-[12px] font-bold shrink-0">to</span>
+                          <input
+                            type="time"
+                            value={settings.deadHoursEndTime}
+                            onChange={(e) => {
+                              const newEnd = e.target.value;
+                              const formatted = `${formatTime12h(settings.deadHoursStartTime)} – ${formatTime12h(newEnd)}`;
+                              setSettings({
+                                ...settings,
+                                deadHoursEndTime: newEnd,
+                                deadHoursTime: formatted,
+                              });
+                            }}
+                            className="h-10 flex-1 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2.5 font-medium text-[#0A0A0B] text-[12.5px] focus:outline-none focus:border-[#0A0A0B] focus:bg-white transition-colors"
+                          />
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom side explanation */}
-                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
-                      <div className="flex items-center gap-1.5 text-[#0A0A0B] font-bold">
-                        <span>🔒 Weekend Margin Shield</span>
-                        <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px]">Active</span>
-                      </div>
-                      <p className="text-[#52525B] leading-relaxed">
-                        Offers are scheduled only for slow afternoons ({settings.deadHoursDays}, {settings.deadHoursTime}) to fill empty tables. Peak weekend hours (Fri–Sun) are automatically locked to protect full-price revenue.
-                      </p>
-                    </div>
-
-                    <div className="pt-1 flex justify-end">
+                    <div className="pt-2 flex justify-end">
                       <button
                         onClick={handleSaveSettings}
                         className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
                       >
                         Save Timing Changes
                       </button>
+                    </div>
+                  </div>
+
+                  {/* NEW STANDALONE EXPLANATION BOX IN THE BOTTOM */}
+                  <div className="rounded-xl border border-black/[0.06] bg-[#FAFAFA] p-4.5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/5 text-[#0A0A0B]">
+                        <IconClock className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-[13px] font-bold text-[#0A0A0B]">
+                          How Dead Hours Yield Management Works
+                        </h4>
+                        <p className="text-[11.5px] text-[#71717A]">
+                          Increases revenue on idle café hours while protecting full-price weekend margins.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-[12px]">
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#0A0A0B] flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-[#D97706]" />
+                            Slow Afternoon Target
+                          </span>
+                          <span className="rounded bg-[#FEF3C7] text-[#B45309] px-1.5 py-0.2 text-[10px] font-bold">
+                            Active
+                          </span>
+                        </div>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          Win-back discount offers are valid exclusively during your selected downtime window ({settings.deadHoursDays}, {settings.deadHoursTime}). Regulars are motivated to visit when seats would otherwise sit empty.
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#0A0A0B] flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-[#16A34A]" />
+                            Weekend Margin Shield
+                          </span>
+                          <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px] font-bold">
+                            Protected
+                          </span>
+                        </div>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          Peak Friday dinner rush and all weekend shifts (Sat–Sun) are automatically locked. Revisit never offers discounts to customers who would happily pay full price during your busiest hours.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1663,17 +1706,23 @@ export default function DemoPage() {
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
-                        Google Maps Review Booster
-                      </h3>
-                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">
+                      <div>
+                        <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">
+                          Google Maps Review Booster
+                        </h3>
+                        <p className="text-[12px] text-[#71717A]">
+                          Automate 5-star ratings from your happiest regulars.
+                        </p>
+                      </div>
+
+                      <span className="rounded-lg bg-[#ECFDF5] text-[#047857] px-2.5 py-1 text-[11px] font-bold">
                         Active
                       </span>
                     </div>
 
                     <div className="text-[12px] space-y-3">
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">
                           Google Maps Direct Review Link
                         </label>
                         <div className="flex gap-2">
@@ -1683,11 +1732,11 @@ export default function DemoPage() {
                             onChange={(e) =>
                               setSettings({ ...settings, googleMapsReviewUrl: e.target.value })
                             }
-                            className="flex-1 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B] focus:outline-none focus:border-[#0A0A0B]"
+                            className="h-10 flex-1 rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 font-medium text-[#0A0A0B] text-[12.5px] focus:outline-none focus:border-[#0A0A0B] focus:bg-white transition-colors"
                           />
                           <button
                             onClick={() => window.open(settings.googleMapsReviewUrl, "_blank")}
-                            className="rounded-lg border border-black/[0.1] px-3 py-1.5 font-semibold text-[#52525B] hover:bg-black/5 shrink-0 cursor-pointer"
+                            className="h-10 rounded-lg border border-black/[0.1] px-3.5 font-bold text-[#52525B] hover:bg-black/5 shrink-0 cursor-pointer text-[12px]"
                           >
                             Test Link ↗
                           </button>
@@ -1695,11 +1744,11 @@ export default function DemoPage() {
                       </div>
 
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">
                           Auto-Trigger Threshold
                         </label>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#52525B]">Ask regulars after visit #</span>
+                          <span className="text-[#52525B] text-[12.5px]">Request rating after customer completes visit #</span>
                           <input
                             type="number"
                             min="2"
@@ -1711,30 +1760,56 @@ export default function DemoPage() {
                                 autoGoogleReviewTriggerVisits: Number(e.target.value),
                               })
                             }
-                            className="w-16 text-center rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 py-1 font-bold text-[#0A0A0B]"
+                            className="h-9 w-16 text-center rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-2 font-bold text-[#0A0A0B] text-[13px]"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom side explanation */}
-                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
-                      <div className="flex items-center gap-1.5 text-[#0A0A0B] font-bold">
-                        <span>⭐ Regular-Only Protection</span>
-                        <span className="rounded bg-[#ECFDF5] text-[#047857] px-1.5 py-0.2 text-[10px]">Shield Active</span>
-                      </div>
-                      <p className="text-[#52525B]">
-                        Review links are only sent to regulars who have completed at least {settings.autoGoogleReviewTriggerVisits} visits. This filters out first-time issues and guarantees positive 5★ ratings.
-                      </p>
-                    </div>
-
-                    <div className="pt-1 flex justify-end">
+                    <div className="pt-2 flex justify-end">
                       <button
                         onClick={handleSaveSettings}
                         className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
                       >
                         Save Google Settings
                       </button>
+                    </div>
+                  </div>
+
+                  {/* NEW STANDALONE EXPLANATION BOX IN THE BOTTOM */}
+                  <div className="rounded-xl border border-black/[0.06] bg-[#FAFAFA] p-4.5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/5 text-[#0A0A0B]">
+                        <IconStar className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-[13px] font-bold text-[#0A0A0B]">
+                          How the Google Review Booster Works
+                        </h4>
+                        <p className="text-[11.5px] text-[#71717A]">
+                          Builds unstoppable social proof on Google Maps with verified happy customers.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-[12px]">
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          ⭐ Regulars-Only Shield
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          Only guests who have visited {settings.autoGoogleReviewTriggerVisits}+ times are asked for a review. This completely protects your public rating from disgruntled one-off visitors.
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          ⚡ Zero-Friction Deep Link
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          The WhatsApp message contains your direct 5-star review modal link, opening the rating card on their phone in 1 click without needing to search your café on Maps.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1745,33 +1820,36 @@ export default function DemoPage() {
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">Outlet & POS Connection</h3>
-                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">Connected</span>
+                      <div>
+                        <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">Outlet & POS Connection</h3>
+                        <p className="text-[#71717A] text-[12px]">Compatible with your existing counter billing setup.</p>
+                      </div>
+                      <span className="rounded-lg bg-[#ECFDF5] text-[#047857] px-2.5 py-1 text-[11px] font-bold">Connected</span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">Café Name</label>
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">Café Name</label>
                         <input
                           type="text"
                           defaultValue="The Daily Brew"
-                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]"
+                          className="h-10 w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 font-medium text-[#0A0A0B] text-[12.5px]"
                         />
                       </div>
 
                       <div>
-                        <label className="font-bold text-[#0A0A0B] block mb-1">Outlet Location</label>
+                        <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">Outlet Location</label>
                         <input
                           type="text"
                           defaultValue="100 Ft Road, Indiranagar, Bangalore"
-                          className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]"
+                          className="h-10 w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 font-medium text-[#0A0A0B] text-[12.5px]"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="font-bold text-[#0A0A0B] block mb-1">Current Billing POS Software</label>
-                      <select className="w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 py-1.5 font-medium text-[#0A0A0B]">
+                      <label className="text-[12px] font-bold text-[#0A0A0B] block mb-1.5">Current Billing POS Software</label>
+                      <select className="h-10 w-full rounded-lg border border-black/[0.1] bg-[#FAFAFA] px-3 font-medium text-[#0A0A0B] text-[12.5px] cursor-pointer">
                         <option>Petpooja (Most popular in India)</option>
                         <option>Posist / Restroworks</option>
                         <option>Pine Labs</option>
@@ -1780,15 +1858,50 @@ export default function DemoPage() {
                       </select>
                     </div>
 
-                    {/* Bottom side explanation */}
-                    <div className="rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] p-3 text-[#065F46] space-y-1">
-                      <p className="font-bold text-[#047857] flex items-center gap-1.5">
-                        <IconCheck className="h-4 w-4" />
-                        <span>Integration Mode: Receipt Camera OCR</span>
-                      </p>
-                      <p className="mt-0.5 text-[11px]">
-                        Cashiers take a photo of the printed paper bill. Revisit extracts totals and line items without needing direct POS API changes.
-                      </p>
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleSaveSettings}
+                        className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
+                      >
+                        Save POS Settings
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* NEW STANDALONE EXPLANATION BOX IN THE BOTTOM */}
+                  <div className="rounded-xl border border-black/[0.06] bg-[#FAFAFA] p-4.5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/5 text-[#0A0A0B]">
+                        <IconStore className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-[13px] font-bold text-[#0A0A0B]">
+                          How the Receipt Camera Bridge Works
+                        </h4>
+                        <p className="text-[11.5px] text-[#71717A]">
+                          Zero hardware disruption, zero complex POS software changes.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-[12px]">
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          📷 Works With Any POS
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          You don&apos;t need custom API approvals from Petpooja or Posist. Cashiers print the standard receipt as usual and snap a 2-second photo.
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          ⚡ Instant Line-Item OCR
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          Optical character recognition extracts the bill subtotal, taxes, and ordered items to continuously learn each customer&apos;s favorite menu choices.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1799,11 +1912,14 @@ export default function DemoPage() {
                 <div className="space-y-4 max-w-[620px]">
                   <div className="rounded-xl bg-white p-5 border border-black/[0.06] shadow-xs space-y-4 text-[12px]">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">WhatsApp Outreach Guardrails</h3>
-                      <span className="rounded bg-[#ECFDF5] text-[#047857] px-2 py-0.5 text-[11px] font-bold">Protected</span>
+                      <div>
+                        <h3 className="text-[14.5px] font-bold text-[#0A0A0B]">WhatsApp Outreach Guardrails</h3>
+                        <p className="text-[#71717A] text-[12px]">Protect your customer relationships from fatigue and spam.</p>
+                      </div>
+                      <span className="rounded-lg bg-[#ECFDF5] text-[#047857] px-2.5 py-1 text-[11px] font-bold">Protected</span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3">
                         <span className="text-[11px] text-[#71717A] block mb-0.5 font-medium">Delivery Mode</span>
                         <span className="font-bold text-[#0A0A0B] text-[12.5px] block">Manual Send (wa.me)</span>
@@ -1815,12 +1931,50 @@ export default function DemoPage() {
                       </div>
                     </div>
 
-                    {/* Bottom side explanation */}
-                    <div className="rounded-lg bg-[#FAFAFA] border border-black/[0.06] p-3 text-[11.5px] space-y-1">
-                      <p className="font-bold text-[#0A0A0B]">💬 Direct WhatsApp Dispatch</p>
-                      <p className="text-[#52525B]">
-                        Messages dispatch directly from your device using wa.me links to eliminate per-conversation Meta fees, capped at 1 message per 14 days per guest.
-                      </p>
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleSaveSettings}
+                        className="rounded-lg bg-[#0A0A0B] px-4 py-2 text-[12px] font-bold text-white hover:bg-black/90 cursor-pointer shadow-xs"
+                      >
+                        Save Guardrails
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* NEW STANDALONE EXPLANATION BOX IN THE BOTTOM */}
+                  <div className="rounded-xl border border-black/[0.06] bg-[#FAFAFA] p-4.5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/5 text-[#0A0A0B]">
+                        <IconWhatsApp className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-[13px] font-bold text-[#0A0A0B]">
+                          How WhatsApp Guardrails Work
+                        </h4>
+                        <p className="text-[11.5px] text-[#71717A]">
+                          100% compliant with WhatsApp terms with zero extra messaging costs.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-[12px]">
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          💬 Zero Meta Utility Fees
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          By launching chats directly through your device via wa.me, you skip expensive Meta Cloud API per-conversation charges and template verification rejections.
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-white p-3.5 border border-black/[0.06] space-y-1.5 shadow-xs">
+                        <span className="font-bold text-[#0A0A0B] block">
+                          🛡️ Anti-Fatigue Capping
+                        </span>
+                        <p className="text-[#52525B] text-[11.5px] leading-relaxed">
+                          Revisit automatically blocks duplicate outreach to the same guest within a 14-day window. Your regulars feel valued rather than spammed.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
