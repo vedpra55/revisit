@@ -60,6 +60,14 @@ body {
   animation: dashmove 1.6s linear infinite;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @keyframes dashmove {
   to {
     stroke-dashoffset: -24;

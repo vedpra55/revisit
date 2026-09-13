@@ -20,7 +20,7 @@ type DemoTab = "counter" | "outreach" | "rules" | "metrics" | "settings";
 type OutreachMode = "dead_hours" | "google_review" | "win_back";
 type CounterStep = 1 | 2 | 3 | 4;
 
-// Pure minimalist flat toggle switch (no drop shadows, no harsh outlines)
+// Pure minimalist flat toggle switch
 function Toggle({
   checked,
   onChange,
@@ -297,12 +297,12 @@ export default function DemoPage() {
   }, [customers, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] text-zinc-900 antialiased flex flex-col font-sans pb-24 sm:pb-12">
+    <div className="min-h-screen bg-[#F7F7F7] text-zinc-900 antialiased flex flex-col font-sans pb-24 sm:pb-12 w-full overflow-x-hidden">
       {/* Top Header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <IconLogo className="w-7 h-7 text-zinc-900 group-hover:scale-105 transition-transform" />
+            <IconLogo className="w-7 h-7 text-zinc-900 group-hover:scale-105 transition-transform shrink-0" />
             <div>
               <span className="font-semibold tracking-tight text-base text-zinc-900 block leading-tight">Revisit</span>
               <span className="text-[11px] text-zinc-400 font-medium tracking-wide">The Daily Brew • Indiranagar</span>
@@ -341,10 +341,10 @@ export default function DemoPage() {
         </nav>
 
         {/* Header Right Action */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/"
-            className="text-xs font-medium text-zinc-500 hover:text-zinc-900 px-3 py-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
+            className="text-xs font-medium text-zinc-500 hover:text-zinc-900 px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-zinc-100 transition-colors whitespace-nowrap"
           >
             ← Back to Landing
           </Link>
@@ -352,15 +352,15 @@ export default function DemoPage() {
       </header>
 
       {/* Main View Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 pt-5 sm:pt-8 min-w-0">
         {/* =========================================================================
             TAB 1: COUNTER TERMINAL (1 VIEW PER STEP)
         ========================================================================= */}
         {activeNav === "counter" && (
-          <div className="max-w-xl mx-auto space-y-6">
-            {/* Step Breadcrumb Header */}
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-2">
+          <div className="max-w-xl mx-auto space-y-5 sm:space-y-6">
+            {/* Step Breadcrumb Header with Horizontal Scroll */}
+            <div className="flex items-center justify-between gap-2 px-1">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 shrink min-w-0">
                 {[
                   { step: 1, label: "Phone" },
                   { step: 2, label: "Reward" },
@@ -370,12 +370,12 @@ export default function DemoPage() {
                   const isCurrent = counterStep === s.step;
                   const isPast = counterStep > s.step;
                   return (
-                    <div key={s.step} className="flex items-center gap-2">
+                    <div key={s.step} className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
                         disabled={!isPast}
                         onClick={() => isPast && s.step < 4 && setCounterStep(s.step as CounterStep)}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition shrink-0 ${
                           isCurrent
                             ? "bg-zinc-950 text-white font-semibold"
                             : isPast
@@ -386,7 +386,7 @@ export default function DemoPage() {
                         {isPast ? <IconCheck className="w-3 h-3" /> : <span>{s.step}</span>}
                         <span>{s.label}</span>
                       </button>
-                      {s.step < 4 && <span className="text-zinc-300 text-xs">›</span>}
+                      {s.step < 4 && <span className="text-zinc-300 text-xs shrink-0">›</span>}
                     </div>
                   );
                 })}
@@ -396,7 +396,7 @@ export default function DemoPage() {
                 <button
                   type="button"
                   onClick={handleResetCounter}
-                  className="text-xs text-zinc-400 hover:text-zinc-800 font-medium px-2 py-1 rounded-md hover:bg-zinc-200/60 transition"
+                  className="text-xs text-zinc-400 hover:text-zinc-800 font-medium px-2.5 py-1 rounded-md hover:bg-zinc-200/60 transition shrink-0 ml-2"
                 >
                   Reset
                 </button>
@@ -407,11 +407,11 @@ export default function DemoPage() {
                 STEP 1: PHONE LOOKUP
             ----------------------------------------------------------------- */}
             {counterStep === 1 && (
-              <div className="space-y-6 animate-in fade-in duration-150">
-                {/* Quick Test Numbers */}
-                <div className="flex items-center justify-between text-xs text-zinc-400">
-                  <span className="font-medium">Quick sample numbers:</span>
-                  <div className="flex items-center gap-1.5">
+              <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-150">
+                {/* Quick Test Numbers with Horizontal Scroll */}
+                <div className="flex items-center justify-between gap-2 text-xs text-zinc-400">
+                  <span className="font-medium shrink-0">Quick samples:</span>
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
                     {[
                       { label: "Rahul (Regular)", digits: "9876543210" },
                       { label: "Simran (VIP)", digits: "9654321098" },
@@ -423,7 +423,7 @@ export default function DemoPage() {
                         onClick={() => {
                           setPhoneDigits(sample.digits);
                         }}
-                        className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition font-mono text-[11px]"
+                        className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition font-mono text-[11px] shrink-0 whitespace-nowrap"
                       >
                         {sample.label}
                       </button>
@@ -432,7 +432,7 @@ export default function DemoPage() {
                 </div>
 
                 {/* Hero Phone Display */}
-                <div className="bg-white rounded-2xl p-7 text-center space-y-1">
+                <div className="bg-white rounded-2xl p-6 sm:p-7 text-center space-y-1">
                   <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Customer Mobile</span>
                   <div className="text-3xl sm:text-4xl font-mono font-semibold text-zinc-900 min-h-[52px] flex items-center justify-center tracking-tight">
                     {phoneDigits ? formatPhoneDisplay(phoneDigits) : <span className="text-zinc-300">98765 00000</span>}
@@ -447,7 +447,7 @@ export default function DemoPage() {
                 </div>
 
                 {/* Tactile Touch Keypad */}
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
                   {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "⌫"].map((key) => (
                     <button
                       key={key}
@@ -480,7 +480,7 @@ export default function DemoPage() {
                 STEP 2: REWARD & RECOGNITION (DEDICATED VIEW)
             ----------------------------------------------------------------- */}
             {counterStep === 2 && (
-              <div className="bg-white rounded-2xl p-7 space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-5 sm:p-7 space-y-5 sm:space-y-6 animate-in fade-in duration-150">
                 {/* Back Nav */}
                 <div className="flex items-center justify-between">
                   <button
@@ -495,20 +495,20 @@ export default function DemoPage() {
 
                 {/* Profile Section */}
                 <div className="flex items-start justify-between gap-4 pt-1">
-                  <div className="flex items-center gap-3.5">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className={`w-12 sm:w-14 h-12 sm:h-14 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold shrink-0 ${
                       isExistingCustomer
                         ? "bg-zinc-950 text-white"
                         : "bg-amber-100 text-amber-900"
                     }`}>
                       {isExistingCustomer ? currentCounterCustomer.name.charAt(0) : "★"}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-semibold text-zinc-900 tracking-tight">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-base sm:text-lg font-semibold text-zinc-900 tracking-tight truncate">
                           {currentCounterCustomer.name}
                         </h2>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium shrink-0 ${
                           isExistingCustomer
                             ? "bg-zinc-100 text-zinc-800"
                             : "bg-amber-100 text-amber-900"
@@ -516,7 +516,7 @@ export default function DemoPage() {
                           {isExistingCustomer ? `${currentCounterCustomer.visits} visits` : "First-Time Guest"}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-0.5">
+                      <p className="text-xs text-zinc-400 mt-0.5 truncate">
                         {isExistingCustomer
                           ? `Favorite: ${currentCounterCustomer.favoriteItem} • Member since ${currentCounterCustomer.customerSince}`
                           : "New customer auto-enrolled on this bill"}
@@ -539,38 +539,40 @@ export default function DemoPage() {
                   </div>
                 )}
 
-                {/* High-Impact Reward Card */}
+                {/* High-Impact Reward Card (Clean Hierarchy, No Wrapping Issues) */}
                 {isExistingCustomer ? (
-                  <div className="bg-emerald-50 rounded-2xl p-5 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800 tracking-wide uppercase">
-                        Loyalty Reward Available
+                  <div className="bg-emerald-50 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800 tracking-wide uppercase shrink-0">
+                        Loyalty Milestone
                       </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-emerald-900">Apply Discount</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-medium text-emerald-900">Apply in POS</span>
                         <Toggle checked={isRewardAppliedInPos} onChange={setIsRewardAppliedInPos} />
                       </div>
                     </div>
 
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold font-mono text-emerald-950">
+                    <div className="pt-1">
+                      <div className="text-3xl sm:text-4xl font-bold font-mono text-emerald-950 tracking-tight whitespace-nowrap">
                         ₹{currentCounterCustomer.availableReward} OFF
-                      </span>
-                      <span className="text-xs text-emerald-800">unlocked on current bill</span>
+                      </div>
+                      <div className="text-xs text-emerald-800 font-medium mt-0.5">
+                        Reward discount ready to deduct on this bill
+                      </div>
                     </div>
 
-                    <p className="text-xs text-emerald-700/90 leading-relaxed">
+                    <p className="text-xs text-emerald-700/90 leading-relaxed pt-1">
                       {isRewardAppliedInPos
-                        ? `Cashier: Deduct ₹${currentCounterCustomer.availableReward} on POS machine before collecting payment.`
+                        ? `Punch ₹${currentCounterCustomer.availableReward} discount on your POS machine before taking payment.`
                         : "Reward saved for customer's next visit."}
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-amber-50 rounded-2xl p-5 space-y-2">
+                  <div className="bg-amber-50 rounded-2xl p-4 sm:p-5 space-y-2">
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-900 tracking-wide uppercase">
                       Welcome Incentive
                     </span>
-                    <div className="text-2xl font-bold font-mono text-amber-950">
+                    <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 whitespace-nowrap">
                       ₹50 OFF on Visit #2
                     </div>
                     <p className="text-xs text-amber-800/90 leading-relaxed">
@@ -594,7 +596,7 @@ export default function DemoPage() {
                 STEP 3: BILL CAPTURE & CHECKOUT (DEDICATED VIEW)
             ----------------------------------------------------------------- */}
             {counterStep === 3 && (
-              <div className="bg-white rounded-2xl p-7 space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-5 sm:p-7 space-y-5 sm:space-y-6 animate-in fade-in duration-150">
                 {/* Back Nav */}
                 <div className="flex items-center justify-between">
                   <button
@@ -652,7 +654,7 @@ export default function DemoPage() {
                         key={amt}
                         type="button"
                         onClick={() => setBillAmount(amt)}
-                        className={`py-2 rounded-xl text-xs font-mono font-medium transition ${
+                        className={`py-2.5 rounded-xl text-xs font-mono font-medium transition text-center ${
                           billAmount === amt
                             ? "bg-zinc-950 text-white font-bold"
                             : "bg-zinc-100 text-zinc-800 hover:bg-zinc-200/70"
@@ -717,7 +719,7 @@ export default function DemoPage() {
                 STEP 4: SUCCESS CONFIRMATION & LIVE WHATSAPP LOOP
             ----------------------------------------------------------------- */}
             {counterStep === 4 && (
-              <div className="bg-white rounded-2xl p-8 text-center space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 text-center space-y-5 sm:space-y-6 animate-in fade-in duration-150">
                 <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
                   <IconCheck className="w-7 h-7" />
                 </div>
@@ -730,7 +732,7 @@ export default function DemoPage() {
                 </div>
 
                 {/* WhatsApp Receipt Card Mockup */}
-                <div className="bg-[#ECE5DD] p-4 rounded-2xl text-left max-w-sm mx-auto">
+                <div className="bg-[#ECE5DD] p-3.5 sm:p-4 rounded-2xl text-left max-w-sm mx-auto">
                   <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 space-y-1.5 leading-relaxed">
                     <div className="font-semibold text-zinc-950 flex items-center justify-between">
                       <span>The Daily Brew • Indiranagar</span>
@@ -775,11 +777,11 @@ export default function DemoPage() {
         )}
 
         {/* =========================================================================
-            TAB 2: BRING THEM BACK (OUTREACH)
+            TAB 2: BRING THEM BACK (OUTREACH WITH HORIZONTAL MOBILE SCROLL)
         ========================================================================= */}
         {activeNav === "outreach" && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">Automated Outreach</h2>
                 <p className="text-xs text-zinc-500 mt-0.5">
@@ -787,8 +789,8 @@ export default function DemoPage() {
                 </p>
               </div>
 
-              {/* Mode Switcher */}
-              <div className="flex items-center gap-1 bg-zinc-200/60 p-1 rounded-xl">
+              {/* Mode Switcher with Horizontal Scroll */}
+              <div className="flex items-center gap-1 bg-zinc-200/60 p-1 rounded-xl overflow-x-auto no-scrollbar shrink-0 max-w-full">
                 {(
                   [
                     { id: "dead_hours", label: "Dead Hours" },
@@ -799,7 +801,7 @@ export default function DemoPage() {
                   <button
                     key={m.id}
                     onClick={() => setOutreachMode(m.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 whitespace-nowrap ${
                       outreachMode === m.id
                         ? "bg-white text-zinc-950 font-semibold"
                         : "text-zinc-600 hover:text-zinc-900"
@@ -819,10 +821,47 @@ export default function DemoPage() {
               </div>
             )}
 
-            {/* Two Column Outreach Canvas */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              {/* Left Column: Overdue Regulars List */}
-              <div className="md:col-span-2 space-y-2.5">
+            {/* Mobile Customer Selection: Smooth Horizontal Scroll Strip */}
+            <div className="md:hidden space-y-2">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Select Regular</span>
+                <span className="text-[11px] text-zinc-400 font-medium">Swipe horizontally →</span>
+              </div>
+              <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 snap-x px-0.5">
+                {customers.map((c) => {
+                  const isSelected = selectedOutreachCustomer?.id === c.id;
+                  return (
+                    <div
+                      key={c.id}
+                      onClick={() => setSelectedOutreachCustomer(c)}
+                      className={`p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between min-w-[170px] snap-start shrink-0 ${
+                        isSelected ? "bg-zinc-200/90 font-medium" : "bg-white hover:bg-zinc-100/70"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-medium flex items-center justify-center text-xs shrink-0">
+                          {c.name.charAt(0)}
+                        </div>
+                        {c.isOverdue && (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-100 text-amber-900 shrink-0">
+                            Overdue
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-xs text-zinc-900 truncate">{c.name}</div>
+                        <div className="text-[10px] text-zinc-400 mt-0.5">Last seen: {c.lastVisitDaysAgo}d ago</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Desktop Two Column Canvas */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-5 sm:gap-6">
+              {/* Desktop Left Column: Overdue Regulars List */}
+              <div className="hidden md:block md:col-span-2 space-y-2.5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Eligible Regulars</span>
                 {customers.map((c) => {
                   const isSelected = selectedOutreachCustomer?.id === c.id;
@@ -855,19 +894,19 @@ export default function DemoPage() {
                 })}
               </div>
 
-              {/* Right Column: WhatsApp Composer Preview (No Black Borders) */}
-              <div className="md:col-span-3 bg-white rounded-2xl p-6 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-1">
-                    <div className="flex items-center gap-2">
-                      <IconWhatsApp className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs font-semibold text-zinc-900">WhatsApp Direct Note</span>
+              {/* Right Column: WhatsApp Composer Preview (Responsive, No Overflow) */}
+              <div className="md:col-span-3 bg-white rounded-2xl p-4 sm:p-6 flex flex-col justify-between space-y-5 min-w-0">
+                <div className="space-y-4 min-w-0">
+                  <div className="flex items-center justify-between pb-1 gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <IconWhatsApp className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="text-xs font-semibold text-zinc-900 truncate">WhatsApp Direct Note</span>
                     </div>
-                    <span className="text-[11px] text-zinc-400 font-mono">{selectedOutreachCustomer?.phone}</span>
+                    <span className="text-[11px] text-zinc-400 font-mono shrink-0">{selectedOutreachCustomer?.phone}</span>
                   </div>
 
                   {/* WhatsApp Bubble Preview */}
-                  <div className="bg-[#ECE5DD] p-4 rounded-2xl space-y-2">
+                  <div className="bg-[#ECE5DD] p-3.5 sm:p-4 rounded-2xl space-y-2">
                     <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 max-w-sm ml-auto leading-relaxed">
                       {currentWhatsAppMessage}
                       <div className="text-[9px] text-zinc-400 text-right mt-1.5 flex items-center justify-end gap-1">
@@ -878,23 +917,24 @@ export default function DemoPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-3 pt-2">
+                {/* Action Buttons: Responsive Layout (Full-width on mobile, side-by-side on desktop) */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
                   <a
                     href={`https://wa.me/${cleanDigits(selectedOutreachCustomer.phone)}?text=${encodeURIComponent(
                       currentWhatsAppMessage
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 py-3.5 rounded-xl bg-emerald-600 text-white font-medium text-xs hover:bg-emerald-700 transition text-center flex items-center justify-center gap-2"
+                    className="w-full sm:flex-1 py-3.5 rounded-xl bg-emerald-600 text-white font-medium text-xs hover:bg-emerald-700 transition text-center flex items-center justify-center gap-2 shrink-0"
                   >
                     <IconWhatsApp className="w-4 h-4" />
                     Open in WhatsApp
                   </a>
 
                   <button
+                    type="button"
                     onClick={() => handleSimulateReturn(selectedOutreachCustomer)}
-                    className="px-4 py-3.5 rounded-xl bg-zinc-100 text-zinc-800 font-medium text-xs hover:bg-zinc-200 transition"
+                    className="w-full sm:w-auto px-4 py-3.5 rounded-xl bg-zinc-100 text-zinc-800 font-medium text-xs hover:bg-zinc-200 transition text-center shrink-0"
                   >
                     Simulate Return (₹420)
                   </button>
@@ -908,15 +948,15 @@ export default function DemoPage() {
             TAB 3: OFFER RULES
         ========================================================================= */}
         {activeNav === "rules" && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="max-w-2xl mx-auto space-y-5 sm:space-y-6">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">Reward & Retention Rules</h2>
                 <p className="text-xs text-zinc-500 mt-0.5">Automate perks without manual discounts or coupons</p>
               </div>
               <button
                 onClick={() => setIsAddingRule(!isAddingRule)}
-                className="px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition"
+                className="px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition shrink-0"
               >
                 {isAddingRule ? "Cancel" : "+ New Rule"}
               </button>
@@ -924,7 +964,7 @@ export default function DemoPage() {
 
             {/* New Rule Creator */}
             {isAddingRule && (
-              <div className="bg-white rounded-2xl p-6 space-y-4 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-5 sm:p-6 space-y-4 animate-in fade-in duration-150">
                 <h3 className="font-semibold text-sm text-zinc-900">Configure Loyalty Trigger</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -982,22 +1022,22 @@ export default function DemoPage() {
               {offerRules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="bg-white rounded-2xl p-5 flex items-center justify-between gap-4 transition hover:bg-zinc-50"
+                  className="bg-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 transition hover:bg-zinc-50"
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-medium text-sm text-zinc-900">{rule.name}</h4>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600 shrink-0">
                         {rule.triggerType === "visits_milestone" && `Visit #${rule.triggerValue}`}
                         {rule.triggerType === "days_overdue" && `>${rule.triggerValue}d gap`}
                         {rule.triggerType === "total_spend" && `Spend >₹${rule.triggerValue}`}
                         {rule.triggerType === "inactivity" && `Inactive ${rule.triggerValue}d`}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-500">{rule.description}</p>
+                    <p className="text-xs text-zinc-500 truncate">{rule.description}</p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 shrink-0">
                     <span className="text-xs font-semibold text-zinc-900 font-mono">
                       {rule.rewardType === "percent_discount" ? `${rule.rewardValue}%` : `₹${rule.rewardValue}`} OFF
                     </span>
@@ -1013,27 +1053,27 @@ export default function DemoPage() {
             TAB 4: METRICS & GUEST DIRECTORY
         ========================================================================= */}
         {activeNav === "metrics" && (
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6">
             <div>
               <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">Business Impact & Guests</h2>
               <p className="text-xs text-zinc-500 mt-0.5">Live recovery metrics and verified customer profiles</p>
             </div>
 
             {/* 3 Clean Key Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white rounded-2xl p-4 sm:p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Recovered Revenue</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">₹24,800</div>
                 <div className="text-xs text-emerald-600 font-medium mt-1">6.0x return on rewards</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5">
+              <div className="bg-white rounded-2xl p-4 sm:p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Repeat Visit Lift</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">38.4%</div>
                 <div className="text-xs text-emerald-600 font-medium mt-1">+14% vs conventional cafes</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5">
+              <div className="bg-white rounded-2xl p-4 sm:p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">WhatsApp Opt-in</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">94.2%</div>
                 <div className="text-xs text-zinc-400 font-medium mt-1">Direct guest relationships</div>
@@ -1041,40 +1081,40 @@ export default function DemoPage() {
             </div>
 
             {/* Guest Directory */}
-            <div className="bg-white rounded-2xl p-5 space-y-4">
-              <div className="flex items-center justify-between gap-4">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 space-y-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
                 <h3 className="font-semibold text-sm text-zinc-900">Verified Regulars ({filteredCustomers.length})</h3>
-                <div className="relative w-48 sm:w-64">
+                <div className="relative w-full sm:w-64">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search name or phone..."
-                    className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
+                    className="w-full text-xs pl-8 pr-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                   />
-                  <IconSearch className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2" />
+                  <IconSearch className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
                 </div>
               </div>
 
               <div className="space-y-1">
                 {filteredCustomers.map((c) => (
-                  <div key={c.id} className="py-2.5 px-2 rounded-xl hover:bg-zinc-50 transition flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-medium flex items-center justify-center text-xs">
+                  <div key={c.id} className="py-2.5 px-2 rounded-xl hover:bg-zinc-50 transition flex items-center justify-between text-xs gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-medium flex items-center justify-center text-xs shrink-0">
                         {c.name.charAt(0)}
                       </div>
-                      <div>
-                        <div className="font-medium text-zinc-900">{c.name}</div>
-                        <div className="text-[11px] text-zinc-400">{c.phone} • {c.favoriteItem}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-zinc-900 truncate">{c.name}</div>
+                        <div className="text-[11px] text-zinc-400 truncate">{c.phone} • {c.favoriteItem}</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 sm:gap-6 shrink-0">
                       <div className="text-right">
                         <div className="font-medium text-zinc-900 font-mono">₹{c.totalSpent}</div>
                         <div className="text-[11px] text-zinc-400">{c.visits} visits</div>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${
                         c.status === "VIP customer"
                           ? "bg-amber-100 text-amber-900"
                           : "bg-zinc-100 text-zinc-700"
@@ -1093,8 +1133,8 @@ export default function DemoPage() {
             TAB 5: SETTINGS
         ========================================================================= */}
         {activeNav === "settings" && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="max-w-2xl mx-auto space-y-5 sm:space-y-6">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">Cafe Automation Settings</h2>
                 <p className="text-xs text-zinc-500 mt-0.5">Automated schedules, Google Maps ratings, and POS integration</p>
@@ -1102,7 +1142,7 @@ export default function DemoPage() {
 
               <button
                 onClick={handleSaveSettings}
-                className="px-4 py-2 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition active:scale-95"
+                className="px-4 py-2 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition active:scale-95 shrink-0"
               >
                 Save Settings
               </button>
@@ -1116,8 +1156,8 @@ export default function DemoPage() {
             )}
 
             {/* Group 1: Dead Hours Yield */}
-            <div className="bg-white rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Dead Hours Yield</h3>
                   <p className="text-xs text-zinc-400">Fill empty tables during slow weekday afternoons</p>
@@ -1170,8 +1210,8 @@ export default function DemoPage() {
             </div>
 
             {/* Group 2: Google Maps Reviews */}
-            <div className="bg-white rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Google Maps 5★ Reviews</h3>
                   <p className="text-xs text-zinc-400">Collect verified high-rating reviews automatically</p>
@@ -1203,7 +1243,7 @@ export default function DemoPage() {
             </div>
 
             {/* Group 3: Counter POS Bridge */}
-            <div className="bg-white rounded-2xl p-6 space-y-3">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 space-y-3">
               <div>
                 <h3 className="font-semibold text-sm text-zinc-900">Counter POS Integration</h3>
                 <p className="text-xs text-zinc-400">Zero tech overhead for cashiers</p>
@@ -1224,8 +1264,8 @@ export default function DemoPage() {
             </div>
 
             {/* Group 4: WhatsApp Guardrails */}
-            <div className="bg-white rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Anti-Spam Guardrails</h3>
                   <p className="text-xs text-zinc-400">Keep customer trust high and unsubscribe rates under 1%</p>
