@@ -20,7 +20,7 @@ type DemoTab = "counter" | "outreach" | "rules" | "metrics" | "settings";
 type OutreachMode = "dead_hours" | "google_review" | "win_back";
 type CounterStep = 1 | 2 | 3 | 4;
 
-// Minimalist iOS/Linear-style toggle switch
+// Pure minimalist flat toggle switch (no drop shadows, no harsh outlines)
 function Toggle({
   checked,
   onChange,
@@ -41,11 +41,11 @@ function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
-        checked ? "bg-[#0A0A0B]" : "bg-zinc-200"
+        checked ? "bg-zinc-950" : "bg-zinc-200"
       } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
     >
       <span
-        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out mt-0.5 ${
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out mt-0.5 ${
           checked ? "translate-x-5" : "translate-x-0.5"
         }`}
       />
@@ -125,7 +125,7 @@ export default function DemoPage() {
       lastVisitDaysAgo: 0,
       favoriteItem: "Cold Brew",
       customerSince: "First Visit Today",
-      availableReward: 50, // Welcome discount on next visit
+      availableReward: 50,
       isOverdue: false,
       defaultMessage: "Welcome to The Daily Brew! Enjoy ₹50 off on your next visit.",
       history: [],
@@ -184,7 +184,6 @@ export default function DemoPage() {
         )
       );
     } else {
-      // Add newly registered customer to state
       const newlyCreated: Customer = {
         id: "c_" + Date.now(),
         name: newGuestName.trim() || "Guest (" + phoneDigits.slice(-4) + ")",
@@ -298,9 +297,9 @@ export default function DemoPage() {
   }, [customers, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 antialiased flex flex-col font-sans pb-24 sm:pb-12">
+    <div className="min-h-screen bg-[#F7F7F7] text-zinc-900 antialiased flex flex-col font-sans pb-24 sm:pb-12">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 group">
             <IconLogo className="w-7 h-7 text-zinc-900 group-hover:scale-105 transition-transform" />
@@ -312,7 +311,7 @@ export default function DemoPage() {
         </div>
 
         {/* Desktop Navigation Tabs */}
-        <nav className="hidden sm:flex items-center gap-1 bg-zinc-100 p-1 rounded-xl">
+        <nav className="hidden sm:flex items-center gap-1 bg-zinc-200/60 p-1 rounded-xl">
           {(
             [
               { id: "counter", label: "Counter Terminal", icon: IconStore },
@@ -328,10 +327,10 @@ export default function DemoPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveNav(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${
                   isActive
-                    ? "bg-white text-zinc-950 shadow-xs"
-                    : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50"
+                    ? "bg-white text-zinc-950 font-semibold"
+                    : "text-zinc-600 hover:text-zinc-900 hover:bg-white/50"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -378,10 +377,10 @@ export default function DemoPage() {
                         onClick={() => isPast && s.step < 4 && setCounterStep(s.step as CounterStep)}
                         className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition ${
                           isCurrent
-                            ? "bg-zinc-900 text-white shadow-xs"
+                            ? "bg-zinc-950 text-white font-semibold"
                             : isPast
                             ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200/80 cursor-pointer"
-                            : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                            : "bg-zinc-200/60 text-zinc-400 cursor-not-allowed"
                         }`}
                       >
                         {isPast ? <IconCheck className="w-3 h-3" /> : <span>{s.step}</span>}
@@ -397,7 +396,7 @@ export default function DemoPage() {
                 <button
                   type="button"
                   onClick={handleResetCounter}
-                  className="text-xs text-zinc-400 hover:text-zinc-800 font-medium px-2 py-1 rounded-md hover:bg-zinc-100 transition"
+                  className="text-xs text-zinc-400 hover:text-zinc-800 font-medium px-2 py-1 rounded-md hover:bg-zinc-200/60 transition"
                 >
                   Reset
                 </button>
@@ -424,7 +423,7 @@ export default function DemoPage() {
                         onClick={() => {
                           setPhoneDigits(sample.digits);
                         }}
-                        className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 shadow-xs hover:bg-zinc-50 transition font-mono text-[11px]"
+                        className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition font-mono text-[11px]"
                       >
                         {sample.label}
                       </button>
@@ -433,7 +432,7 @@ export default function DemoPage() {
                 </div>
 
                 {/* Hero Phone Display */}
-                <div className="bg-white rounded-2xl p-7 text-center shadow-xs space-y-1">
+                <div className="bg-white rounded-2xl p-7 text-center space-y-1">
                   <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Customer Mobile</span>
                   <div className="text-3xl sm:text-4xl font-mono font-semibold text-zinc-900 min-h-[52px] flex items-center justify-center tracking-tight">
                     {phoneDigits ? formatPhoneDisplay(phoneDigits) : <span className="text-zinc-300">98765 00000</span>}
@@ -454,7 +453,7 @@ export default function DemoPage() {
                       key={key}
                       type="button"
                       onClick={() => handleKeypadPress(key)}
-                      className="h-14 sm:h-16 rounded-2xl bg-white text-xl font-medium text-zinc-900 shadow-xs active:scale-95 transition-all hover:bg-zinc-50 flex items-center justify-center select-none"
+                      className="h-14 sm:h-16 rounded-2xl bg-white text-xl font-medium text-zinc-900 active:scale-95 transition-all hover:bg-zinc-100 flex items-center justify-center select-none"
                     >
                       {key}
                     </button>
@@ -466,7 +465,7 @@ export default function DemoPage() {
                   type="button"
                   disabled={phoneDigits.length < 10}
                   onClick={() => setCounterStep(2)}
-                  className={`w-full py-4 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2 shadow-xs ${
+                  className={`w-full py-4 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2 ${
                     phoneDigits.length === 10
                       ? "bg-zinc-950 text-white hover:bg-zinc-800 active:scale-[0.99] cursor-pointer"
                       : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
@@ -481,7 +480,7 @@ export default function DemoPage() {
                 STEP 2: REWARD & RECOGNITION (DEDICATED VIEW)
             ----------------------------------------------------------------- */}
             {counterStep === 2 && (
-              <div className="bg-white rounded-2xl p-7 shadow-xs space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-7 space-y-6 animate-in fade-in duration-150">
                 {/* Back Nav */}
                 <div className="flex items-center justify-between">
                   <button
@@ -500,7 +499,7 @@ export default function DemoPage() {
                     <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
                       isExistingCustomer
                         ? "bg-zinc-950 text-white"
-                        : "bg-amber-100 text-amber-800"
+                        : "bg-amber-100 text-amber-900"
                     }`}>
                       {isExistingCustomer ? currentCounterCustomer.name.charAt(0) : "★"}
                     </div>
@@ -512,7 +511,7 @@ export default function DemoPage() {
                         <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                           isExistingCustomer
                             ? "bg-zinc-100 text-zinc-800"
-                            : "bg-amber-50 text-amber-800"
+                            : "bg-amber-100 text-amber-900"
                         }`}>
                           {isExistingCustomer ? `${currentCounterCustomer.visits} visits` : "First-Time Guest"}
                         </span>
@@ -535,14 +534,14 @@ export default function DemoPage() {
                       value={newGuestName}
                       onChange={(e) => setNewGuestName(e.target.value)}
                       placeholder="e.g. Vikram"
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                     />
                   </div>
                 )}
 
                 {/* High-Impact Reward Card */}
                 {isExistingCustomer ? (
-                  <div className="bg-emerald-50/80 rounded-2xl p-5 space-y-3">
+                  <div className="bg-emerald-50 rounded-2xl p-5 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800 tracking-wide uppercase">
                         Loyalty Reward Available
@@ -567,14 +566,14 @@ export default function DemoPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-amber-50/80 rounded-2xl p-5 space-y-2">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800 tracking-wide uppercase">
+                  <div className="bg-amber-50 rounded-2xl p-5 space-y-2">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-900 tracking-wide uppercase">
                       Welcome Incentive
                     </span>
                     <div className="text-2xl font-bold font-mono text-amber-950">
                       ₹50 OFF on Visit #2
                     </div>
-                    <p className="text-xs text-amber-700/90 leading-relaxed">
+                    <p className="text-xs text-amber-800/90 leading-relaxed">
                       Guest will automatically receive an instant WhatsApp welcome message with their digital loyalty pass.
                     </p>
                   </div>
@@ -584,7 +583,7 @@ export default function DemoPage() {
                 <button
                   type="button"
                   onClick={() => setCounterStep(3)}
-                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Proceed to Bill Capture →
                 </button>
@@ -595,7 +594,7 @@ export default function DemoPage() {
                 STEP 3: BILL CAPTURE & CHECKOUT (DEDICATED VIEW)
             ----------------------------------------------------------------- */}
             {counterStep === 3 && (
-              <div className="bg-white rounded-2xl p-7 shadow-xs space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-7 space-y-6 animate-in fade-in duration-150">
                 {/* Back Nav */}
                 <div className="flex items-center justify-between">
                   <button
@@ -614,8 +613,8 @@ export default function DemoPage() {
                 </div>
 
                 {/* Simulated Slip OCR Box */}
-                <div className="bg-zinc-50 rounded-2xl p-5 text-center space-y-3">
-                  <div className="w-10 h-10 rounded-full bg-white shadow-xs text-zinc-800 mx-auto flex items-center justify-center">
+                <div className="bg-zinc-100 rounded-2xl p-5 text-center space-y-3">
+                  <div className="w-10 h-10 rounded-full bg-white text-zinc-800 mx-auto flex items-center justify-center">
                     <IconCamera className="w-5 h-5" />
                   </div>
 
@@ -636,7 +635,7 @@ export default function DemoPage() {
                     <button
                       type="button"
                       onClick={handleScanBill}
-                      className="px-4 py-2 rounded-xl bg-white shadow-xs text-zinc-800 font-medium text-xs hover:bg-zinc-100 transition inline-flex items-center gap-2"
+                      className="px-4 py-2 rounded-xl bg-white text-zinc-800 font-medium text-xs hover:bg-zinc-50 transition inline-flex items-center gap-2"
                     >
                       <IconCamera className="w-3.5 h-3.5" />
                       {billScannedNotice ? "Re-scan Thermal Slip" : "Simulate Receipt Scan"}
@@ -653,10 +652,10 @@ export default function DemoPage() {
                         key={amt}
                         type="button"
                         onClick={() => setBillAmount(amt)}
-                        className={`py-2 rounded-xl text-xs font-mono font-medium transition shadow-xs ${
+                        className={`py-2 rounded-xl text-xs font-mono font-medium transition ${
                           billAmount === amt
-                            ? "bg-zinc-950 text-white"
-                            : "bg-zinc-50 text-zinc-800 hover:bg-zinc-100"
+                            ? "bg-zinc-950 text-white font-bold"
+                            : "bg-zinc-100 text-zinc-800 hover:bg-zinc-200/70"
                         }`}
                       >
                         ₹{amt}
@@ -666,20 +665,20 @@ export default function DemoPage() {
                 </div>
 
                 {/* Financial Summary Math */}
-                <div className="border-t border-zinc-100 pt-4 space-y-2 text-xs">
+                <div className="bg-zinc-50 p-4 rounded-xl space-y-2 text-xs">
                   <div className="flex items-center justify-between text-zinc-500">
                     <span>Gross Bill Amount</span>
                     <span className="font-mono font-medium text-zinc-900">₹{billAmount}</span>
                   </div>
 
                   {isExistingCustomer && isRewardAppliedInPos && (
-                    <div className="flex items-center justify-between text-emerald-600 font-medium">
+                    <div className="flex items-center justify-between text-emerald-700 font-medium">
                       <span>Loyalty Discount Deducted</span>
                       <span className="font-mono">-₹{currentCounterCustomer.availableReward}</span>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                  <div className="flex items-center justify-between pt-2">
                     <span className="font-semibold text-zinc-900 text-sm">Net Payable at Counter</span>
                     <span className="text-xl font-bold font-mono text-zinc-950">
                       ₹
@@ -698,7 +697,7 @@ export default function DemoPage() {
                 <button
                   type="button"
                   onClick={handleCompleteVisit}
-                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconCheck className="w-4 h-4" />
                   Confirm & Punch Bill (₹
@@ -718,7 +717,7 @@ export default function DemoPage() {
                 STEP 4: SUCCESS CONFIRMATION & LIVE WHATSAPP LOOP
             ----------------------------------------------------------------- */}
             {counterStep === 4 && (
-              <div className="bg-white rounded-2xl p-8 text-center shadow-xs space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-8 text-center space-y-6 animate-in fade-in duration-150">
                 <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
                   <IconCheck className="w-7 h-7" />
                 </div>
@@ -731,8 +730,8 @@ export default function DemoPage() {
                 </div>
 
                 {/* WhatsApp Receipt Card Mockup */}
-                <div className="bg-[#EFEAE2] p-4 rounded-2xl text-left max-w-sm mx-auto shadow-xs">
-                  <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 shadow-xs space-y-1.5 leading-relaxed">
+                <div className="bg-[#ECE5DD] p-4 rounded-2xl text-left max-w-sm mx-auto">
+                  <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 space-y-1.5 leading-relaxed">
                     <div className="font-semibold text-zinc-950 flex items-center justify-between">
                       <span>The Daily Brew • Indiranagar</span>
                       <span className="text-[10px] text-zinc-400 font-normal">Now</span>
@@ -740,7 +739,7 @@ export default function DemoPage() {
                     <p className="text-zinc-700">
                       Hi {currentCounterCustomer.name.split(" ")[0]}! Thanks for visiting us today ☕
                     </p>
-                    <p className="text-zinc-600 font-mono text-[11px] bg-zinc-50 p-2 rounded-lg">
+                    <p className="text-zinc-600 font-mono text-[11px] bg-zinc-100 p-2 rounded-lg">
                       Bill Paid: ₹
                       {Math.max(
                         0,
@@ -766,7 +765,7 @@ export default function DemoPage() {
                 <button
                   type="button"
                   onClick={handleResetCounter}
-                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white text-sm font-medium hover:bg-zinc-800 transition active:scale-95 shadow-xs cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white text-sm font-medium hover:bg-zinc-800 transition active:scale-95 cursor-pointer"
                 >
                   Next Customer (New Bill)
                 </button>
@@ -789,7 +788,7 @@ export default function DemoPage() {
               </div>
 
               {/* Mode Switcher */}
-              <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl">
+              <div className="flex items-center gap-1 bg-zinc-200/60 p-1 rounded-xl">
                 {(
                   [
                     { id: "dead_hours", label: "Dead Hours" },
@@ -802,8 +801,8 @@ export default function DemoPage() {
                     onClick={() => setOutreachMode(m.id)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                       outreachMode === m.id
-                        ? "bg-white text-zinc-900 shadow-xs"
-                        : "text-zinc-500 hover:text-zinc-800"
+                        ? "bg-white text-zinc-950 font-semibold"
+                        : "text-zinc-600 hover:text-zinc-900"
                     }`}
                   >
                     {m.label}
@@ -831,8 +830,8 @@ export default function DemoPage() {
                     <div
                       key={c.id}
                       onClick={() => setSelectedOutreachCustomer(c)}
-                      className={`p-4 rounded-xl cursor-pointer transition shadow-xs flex items-center justify-between ${
-                        isSelected ? "bg-white ring-2 ring-zinc-950" : "bg-white hover:bg-zinc-50"
+                      className={`p-4 rounded-xl cursor-pointer transition flex items-center justify-between ${
+                        isSelected ? "bg-zinc-200/80 font-medium" : "bg-white hover:bg-zinc-100/70"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -847,7 +846,7 @@ export default function DemoPage() {
                         </div>
                       </div>
                       {c.isOverdue && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-900">
                           Overdue
                         </span>
                       )}
@@ -856,10 +855,10 @@ export default function DemoPage() {
                 })}
               </div>
 
-              {/* Right Column: WhatsApp Composer Preview */}
-              <div className="md:col-span-3 bg-white rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-6">
+              {/* Right Column: WhatsApp Composer Preview (No Black Borders) */}
+              <div className="md:col-span-3 bg-white rounded-2xl p-6 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                  <div className="flex items-center justify-between pb-1">
                     <div className="flex items-center gap-2">
                       <IconWhatsApp className="w-4 h-4 text-emerald-600" />
                       <span className="text-xs font-semibold text-zinc-900">WhatsApp Direct Note</span>
@@ -868,8 +867,8 @@ export default function DemoPage() {
                   </div>
 
                   {/* WhatsApp Bubble Preview */}
-                  <div className="bg-[#EFEAE2] p-4 rounded-xl space-y-2">
-                    <div className="bg-white rounded-lg p-3 text-xs text-zinc-800 shadow-xs max-w-sm ml-auto leading-relaxed">
+                  <div className="bg-[#ECE5DD] p-4 rounded-2xl space-y-2">
+                    <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 max-w-sm ml-auto leading-relaxed">
                       {currentWhatsAppMessage}
                       <div className="text-[9px] text-zinc-400 text-right mt-1.5 flex items-center justify-end gap-1">
                         <span>14:32</span>
@@ -887,7 +886,7 @@ export default function DemoPage() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-medium text-xs hover:bg-emerald-700 transition text-center flex items-center justify-center gap-2 shadow-xs"
+                    className="flex-1 py-3.5 rounded-xl bg-emerald-600 text-white font-medium text-xs hover:bg-emerald-700 transition text-center flex items-center justify-center gap-2"
                   >
                     <IconWhatsApp className="w-4 h-4" />
                     Open in WhatsApp
@@ -895,7 +894,7 @@ export default function DemoPage() {
 
                   <button
                     onClick={() => handleSimulateReturn(selectedOutreachCustomer)}
-                    className="px-4 py-3 rounded-xl bg-zinc-100 text-zinc-800 font-medium text-xs hover:bg-zinc-200 transition"
+                    className="px-4 py-3.5 rounded-xl bg-zinc-100 text-zinc-800 font-medium text-xs hover:bg-zinc-200 transition"
                   >
                     Simulate Return (₹420)
                   </button>
@@ -917,7 +916,7 @@ export default function DemoPage() {
               </div>
               <button
                 onClick={() => setIsAddingRule(!isAddingRule)}
-                className="px-3.5 py-1.5 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition"
+                className="px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition"
               >
                 {isAddingRule ? "Cancel" : "+ New Rule"}
               </button>
@@ -925,7 +924,7 @@ export default function DemoPage() {
 
             {/* New Rule Creator */}
             {isAddingRule && (
-              <div className="bg-white rounded-2xl p-6 shadow-xs space-y-4 animate-in fade-in duration-150">
+              <div className="bg-white rounded-2xl p-6 space-y-4 animate-in fade-in duration-150">
                 <h3 className="font-semibold text-sm text-zinc-900">Configure Loyalty Trigger</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -935,7 +934,7 @@ export default function DemoPage() {
                       value={newRuleName}
                       onChange={(e) => setNewRuleName(e.target.value)}
                       placeholder="e.g. 5th Visit Celebration"
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                     />
                   </div>
                   <div>
@@ -943,7 +942,7 @@ export default function DemoPage() {
                     <select
                       value={newRuleTrigger}
                       onChange={(e) => setNewRuleTrigger(e.target.value as TriggerType)}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none"
                     >
                       <option value="visits_milestone">Visit Milestone</option>
                       <option value="days_overdue">Days Inactive</option>
@@ -956,7 +955,7 @@ export default function DemoPage() {
                       type="number"
                       value={newRuleValue}
                       onChange={(e) => setNewRuleValue(Number(e.target.value))}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                     />
                   </div>
                   <div>
@@ -965,13 +964,13 @@ export default function DemoPage() {
                       type="number"
                       value={newRuleReward}
                       onChange={(e) => setNewRuleReward(Number(e.target.value))}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                     />
                   </div>
                 </div>
                 <button
                   onClick={handleSaveNewRule}
-                  className="w-full py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition"
+                  className="w-full py-2.5 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition"
                 >
                   Save Rule
                 </button>
@@ -983,7 +982,7 @@ export default function DemoPage() {
               {offerRules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="bg-white rounded-2xl p-5 shadow-xs flex items-center justify-between gap-4 transition hover:bg-zinc-50/50"
+                  className="bg-white rounded-2xl p-5 flex items-center justify-between gap-4 transition hover:bg-zinc-50"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -1022,19 +1021,19 @@ export default function DemoPage() {
 
             {/* 3 Clean Key Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl p-5 shadow-xs">
+              <div className="bg-white rounded-2xl p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Recovered Revenue</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">₹24,800</div>
                 <div className="text-xs text-emerald-600 font-medium mt-1">6.0x return on rewards</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-xs">
+              <div className="bg-white rounded-2xl p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Repeat Visit Lift</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">38.4%</div>
                 <div className="text-xs text-emerald-600 font-medium mt-1">+14% vs conventional cafes</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-xs">
+              <div className="bg-white rounded-2xl p-5">
                 <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">WhatsApp Opt-in</span>
                 <div className="text-2xl font-bold font-mono text-zinc-900 mt-1">94.2%</div>
                 <div className="text-xs text-zinc-400 font-medium mt-1">Direct guest relationships</div>
@@ -1042,7 +1041,7 @@ export default function DemoPage() {
             </div>
 
             {/* Guest Directory */}
-            <div className="bg-white rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="bg-white rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="font-semibold text-sm text-zinc-900">Verified Regulars ({filteredCustomers.length})</h3>
                 <div className="relative w-48 sm:w-64">
@@ -1051,15 +1050,15 @@ export default function DemoPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search name or phone..."
-                    className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                    className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none focus:bg-zinc-200/70"
                   />
                   <IconSearch className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2" />
                 </div>
               </div>
 
-              <div className="divide-y divide-zinc-100">
+              <div className="space-y-1">
                 {filteredCustomers.map((c) => (
-                  <div key={c.id} className="py-3 flex items-center justify-between text-xs">
+                  <div key={c.id} className="py-2.5 px-2 rounded-xl hover:bg-zinc-50 transition flex items-center justify-between text-xs">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-800 font-medium flex items-center justify-center text-xs">
                         {c.name.charAt(0)}
@@ -1077,7 +1076,7 @@ export default function DemoPage() {
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                         c.status === "VIP customer"
-                          ? "bg-amber-50 text-amber-800"
+                          ? "bg-amber-100 text-amber-900"
                           : "bg-zinc-100 text-zinc-700"
                       }`}>
                         {c.status.replace(" customer", "")}
@@ -1103,7 +1102,7 @@ export default function DemoPage() {
 
               <button
                 onClick={handleSaveSettings}
-                className="px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition active:scale-95 shadow-xs"
+                className="px-4 py-2 rounded-xl bg-zinc-950 text-white text-xs font-medium hover:bg-zinc-800 transition active:scale-95"
               >
                 Save Settings
               </button>
@@ -1117,7 +1116,7 @@ export default function DemoPage() {
             )}
 
             {/* Group 1: Dead Hours Yield */}
-            <div className="bg-white rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="bg-white rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Dead Hours Yield</h3>
@@ -1136,7 +1135,7 @@ export default function DemoPage() {
                     <select
                       value={settings.deadHoursDays}
                       onChange={(e) => setSettings({ ...settings, deadHoursDays: e.target.value })}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none"
                     >
                       <option value="Tuesday – Thursday">Tue – Thu</option>
                       <option value="Monday – Thursday">Mon – Thu</option>
@@ -1150,7 +1149,7 @@ export default function DemoPage() {
                       type="time"
                       value={settings.deadHoursStartTime}
                       onChange={(e) => setSettings({ ...settings, deadHoursStartTime: e.target.value })}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-mono"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none font-mono"
                     />
                   </div>
 
@@ -1160,7 +1159,7 @@ export default function DemoPage() {
                       type="time"
                       value={settings.deadHoursEndTime}
                       onChange={(e) => setSettings({ ...settings, deadHoursEndTime: e.target.value })}
-                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-mono"
+                      className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none font-mono"
                     />
                   </div>
                 </div>
@@ -1171,7 +1170,7 @@ export default function DemoPage() {
             </div>
 
             {/* Group 2: Google Maps Reviews */}
-            <div className="bg-white rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="bg-white rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Google Maps 5★ Reviews</h3>
@@ -1195,7 +1194,7 @@ export default function DemoPage() {
                   value={settings.googleMapsReviewUrl}
                   onChange={(e) => setSettings({ ...settings, googleMapsReviewUrl: e.target.value })}
                   placeholder="https://g.page/r/..."
-                  className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-mono"
+                  className="w-full text-xs px-3 py-2 rounded-lg bg-zinc-100 text-zinc-900 focus:outline-none font-mono"
                 />
               </div>
               <p className="text-[11px] text-zinc-400 pt-1">
@@ -1204,13 +1203,13 @@ export default function DemoPage() {
             </div>
 
             {/* Group 3: Counter POS Bridge */}
-            <div className="bg-white rounded-2xl p-6 shadow-xs space-y-3">
+            <div className="bg-white rounded-2xl p-6 space-y-3">
               <div>
                 <h3 className="font-semibold text-sm text-zinc-900">Counter POS Integration</h3>
                 <p className="text-xs text-zinc-400">Zero tech overhead for cashiers</p>
               </div>
 
-              <div className="p-3 bg-zinc-50 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-zinc-100 rounded-xl flex items-center justify-between">
                 <div>
                   <div className="text-xs font-medium text-zinc-900">Receipt Camera OCR</div>
                   <div className="text-[11px] text-zinc-500">Scan any thermal bill slip to log totals in 1 second</div>
@@ -1225,7 +1224,7 @@ export default function DemoPage() {
             </div>
 
             {/* Group 4: WhatsApp Guardrails */}
-            <div className="bg-white rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="bg-white rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-sm text-zinc-900">Anti-Spam Guardrails</h3>
@@ -1235,11 +1234,11 @@ export default function DemoPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-zinc-50 rounded-xl">
+                <div className="p-3 bg-zinc-100 rounded-xl">
                   <div className="font-medium text-zinc-900">Quiet Hours</div>
                   <div className="text-[11px] text-zinc-400 mt-0.5">No messages 9:30 PM - 9:00 AM</div>
                 </div>
-                <div className="p-3 bg-zinc-50 rounded-xl">
+                <div className="p-3 bg-zinc-100 rounded-xl">
                   <div className="font-medium text-zinc-900">Cooldown Gap</div>
                   <div className="text-[11px] text-zinc-400 mt-0.5">Min 7 days between messages</div>
                 </div>
@@ -1250,9 +1249,9 @@ export default function DemoPage() {
       </main>
 
       {/* =========================================================================
-          MOBILE BOTTOM NAVIGATION DOCK
+          MOBILE BOTTOM NAVIGATION DOCK (PURE FLAT, NO SHADOW, NO TOP BORDER)
       ========================================================================= */}
-      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md px-3 py-2 flex justify-around items-center shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
+      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md px-3 py-2 flex justify-around items-center">
         {(
           [
             { id: "counter", label: "Counter", icon: IconStore },
