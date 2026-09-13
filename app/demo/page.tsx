@@ -18,6 +18,7 @@ import { INITIAL_CUSTOMERS, INITIAL_OFFER_RULES, DEFAULT_CAFE_SETTINGS } from ".
 
 type DemoTab = "counter" | "outreach" | "rules" | "metrics" | "settings";
 type OutreachMode = "dead_hours" | "google_review" | "win_back";
+type CounterStep = 1 | 2 | 3 | 4;
 
 // Minimalist iOS/Linear-style toggle switch
 function Toggle({
@@ -83,12 +84,14 @@ export default function DemoPage() {
   const [settings, setSettings] = useState<CafeSettings>(DEFAULT_CAFE_SETTINGS);
   const [settingsSavedNotice, setSettingsSavedNotice] = useState<boolean>(false);
 
-  // Counter flow state
+  // Counter Multi-Step Flow State: 1 (Phone) -> 2 (Reward & Profile) -> 3 (Bill Capture) -> 4 (Success)
+  const [counterStep, setCounterStep] = useState<CounterStep>(1);
   const [phoneDigits, setPhoneDigits] = useState<string>("9876543210");
+  const [newGuestName, setNewGuestName] = useState<string>("");
   const [isRewardAppliedInPos, setIsRewardAppliedInPos] = useState<boolean>(true);
+  const [billAmount, setBillAmount] = useState<number>(380);
   const [isScanningBill, setIsScanningBill] = useState<boolean>(false);
-  const [scannedBillAmount, setScannedBillAmount] = useState<number | null>(null);
-  const [visitLoggedNotice, setVisitLoggedNotice] = useState<boolean>(false);
+  const [billScannedNotice, setBillScannedNotice] = useState<boolean>(false);
 
   // Offer rule creation state
   const [isAddingRule, setIsAddingRule] = useState<boolean>(false);
@@ -105,28 +108,46 @@ export default function DemoPage() {
   // Directory search
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Matched customer for counter
-  const matchedCustomer = useMemo(() => {
-    if (phoneDigits.length < 10) return null;
-    return customers.find((c) => cleanDigits(c.phone) === phoneDigits) || null;
+  // Customer resolution for counter: matched existing OR newly synthesized customer
+  const currentCounterCustomer = useMemo<Customer>(() => {
+    const matched = customers.find((c) => cleanDigits(c.phone) === phoneDigits);
+    if (matched) return matched;
+
+    // First-time guest fallback (handles any 10-digit number like 82366 99885)
+    return {
+      id: "guest_" + phoneDigits,
+      name: newGuestName.trim() || "New Guest",
+      phone: formatPhoneDisplay(phoneDigits) || "+91 " + phoneDigits,
+      status: "New customer",
+      visits: 0,
+      totalSpent: 0,
+      usualGapDays: 0,
+      lastVisitDaysAgo: 0,
+      favoriteItem: "Cold Brew",
+      customerSince: "First Visit Today",
+      availableReward: 50, // Welcome discount on next visit
+      isOverdue: false,
+      defaultMessage: "Welcome to The Daily Brew! Enjoy ₹50 off on your next visit.",
+      history: [],
+    };
+  }, [phoneDigits, customers, newGuestName]);
+
+  const isExistingCustomer = useMemo(() => {
+    return customers.some((c) => cleanDigits(c.phone) === phoneDigits);
   }, [phoneDigits, customers]);
 
   // Keypad press handler
   const handleKeypadPress = (val: string) => {
     if (val === "C") {
       setPhoneDigits("");
-      setScannedBillAmount(null);
-      setVisitLoggedNotice(false);
       return;
     }
     if (val === "⌫") {
       setPhoneDigits((prev) => prev.slice(0, -1));
-      setVisitLoggedNotice(false);
       return;
     }
     if (phoneDigits.length < 10) {
       setPhoneDigits((prev) => prev + val);
-      setVisitLoggedNotice(false);
     }
   };
 
@@ -135,36 +156,66 @@ export default function DemoPage() {
     setIsScanningBill(true);
     setTimeout(() => {
       setIsScanningBill(false);
-      setScannedBillAmount(380);
-    }, 1100);
+      setBillScannedNotice(true);
+      setBillAmount(380);
+    }, 1000);
   };
 
   // Complete visit
   const handleCompleteVisit = () => {
-    if (!matchedCustomer) return;
-    const finalAmount = Math.max(0, (scannedBillAmount || 380) - (isRewardAppliedInPos ? matchedCustomer.availableReward : 0));
-    setCustomers((prev) =>
-      prev.map((c) =>
-        c.id === matchedCustomer.id
-          ? {
-              ...c,
-              visits: c.visits + 1,
-              totalSpent: c.totalSpent + finalAmount,
-              lastVisitDaysAgo: 0,
-              isOverdue: false,
-              availableReward: 0,
-            }
-          : c
-      )
+    const finalBill = Math.max(
+      0,
+      billAmount - (isRewardAppliedInPos && isExistingCustomer ? currentCounterCustomer.availableReward : 0)
     );
-    setVisitLoggedNotice(true);
+
+    if (isExistingCustomer) {
+      setCustomers((prev) =>
+        prev.map((c) =>
+          c.id === currentCounterCustomer.id
+            ? {
+                ...c,
+                visits: c.visits + 1,
+                totalSpent: c.totalSpent + finalBill,
+                lastVisitDaysAgo: 0,
+                isOverdue: false,
+                availableReward: 0,
+              }
+            : c
+        )
+      );
+    } else {
+      // Add newly registered customer to state
+      const newlyCreated: Customer = {
+        id: "c_" + Date.now(),
+        name: newGuestName.trim() || "Guest (" + phoneDigits.slice(-4) + ")",
+        phone: formatPhoneDisplay(phoneDigits),
+        status: "New customer",
+        visits: 1,
+        totalSpent: finalBill,
+        usualGapDays: 14,
+        lastVisitDaysAgo: 0,
+        favoriteItem: "Cold Brew",
+        customerSince: "Sep 2026",
+        availableReward: 50,
+        isOverdue: false,
+        defaultMessage: "Thanks for joining us at The Daily Brew! Take ₹50 off your next visit.",
+        history: [{ id: "h_" + Date.now(), timeAgo: "Just now", items: "Cold Brew + Snack", amount: finalBill }],
+      };
+      setCustomers((prev) => [newlyCreated, ...prev]);
+    }
+
+    setCounterStep(4);
   };
 
   // Reset counter for next guest
   const handleResetCounter = () => {
     setPhoneDigits("");
-    setScannedBillAmount(null);
-    setVisitLoggedNotice(false);
+    setNewGuestName("");
+    setBillAmount(380);
+    setBillScannedNotice(false);
+    setIsScanningBill(false);
+    setIsRewardAppliedInPos(true);
+    setCounterStep(1);
   };
 
   // Toggle offer rule
@@ -304,161 +355,421 @@ export default function DemoPage() {
       {/* Main View Area */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
         {/* =========================================================================
-            TAB 1: COUNTER TERMINAL
+            TAB 1: COUNTER TERMINAL (1 VIEW PER STEP)
         ========================================================================= */}
         {activeNav === "counter" && (
           <div className="max-w-xl mx-auto space-y-6">
-            {/* Quick Test Picker */}
-            <div className="flex items-center justify-between text-xs text-zinc-400">
-              <span className="font-medium">Quick test numbers:</span>
-              <div className="flex items-center gap-1.5">
+            {/* Step Breadcrumb Header */}
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
                 {[
-                  { label: "Rahul (Regular)", digits: "9876543210" },
-                  { label: "Simran (VIP)", digits: "9654321098" },
-                  { label: "Aman", digits: "8765432109" },
-                ].map((sample) => (
-                  <button
-                    key={sample.digits}
-                    onClick={() => {
-                      setPhoneDigits(sample.digits);
-                      setScannedBillAmount(null);
-                      setVisitLoggedNotice(false);
-                    }}
-                    className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 shadow-xs hover:bg-zinc-50 transition font-mono text-[11px]"
-                  >
-                    {sample.label}
-                  </button>
-                ))}
+                  { step: 1, label: "Phone" },
+                  { step: 2, label: "Reward" },
+                  { step: 3, label: "Bill Slip" },
+                  { step: 4, label: "Done" },
+                ].map((s) => {
+                  const isCurrent = counterStep === s.step;
+                  const isPast = counterStep > s.step;
+                  return (
+                    <div key={s.step} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={!isPast}
+                        onClick={() => isPast && s.step < 4 && setCounterStep(s.step as CounterStep)}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition ${
+                          isCurrent
+                            ? "bg-zinc-900 text-white shadow-xs"
+                            : isPast
+                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200/80 cursor-pointer"
+                            : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                        }`}
+                      >
+                        {isPast ? <IconCheck className="w-3 h-3" /> : <span>{s.step}</span>}
+                        <span>{s.label}</span>
+                      </button>
+                      {s.step < 4 && <span className="text-zinc-300 text-xs">›</span>}
+                    </div>
+                  );
+                })}
               </div>
+
+              {counterStep > 1 && (
+                <button
+                  type="button"
+                  onClick={handleResetCounter}
+                  className="text-xs text-zinc-400 hover:text-zinc-800 font-medium px-2 py-1 rounded-md hover:bg-zinc-100 transition"
+                >
+                  Reset
+                </button>
+              )}
             </div>
 
-            {/* Numeric Display Hero */}
-            <div className="bg-white rounded-2xl p-6 text-center shadow-xs">
-              <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Customer Mobile</span>
-              <div className="text-3xl sm:text-4xl font-mono font-semibold text-zinc-900 mt-1.5 min-h-[48px] flex items-center justify-center tracking-tight">
-                {phoneDigits ? formatPhoneDisplay(phoneDigits) : <span className="text-zinc-300">98765 00000</span>}
-              </div>
-              <p className="text-xs text-zinc-400 mt-1">Tap 10-digit number to instantly pull customer rewards</p>
-            </div>
+            {/* -----------------------------------------------------------------
+                STEP 1: PHONE LOOKUP
+            ----------------------------------------------------------------- */}
+            {counterStep === 1 && (
+              <div className="space-y-6 animate-in fade-in duration-150">
+                {/* Quick Test Numbers */}
+                <div className="flex items-center justify-between text-xs text-zinc-400">
+                  <span className="font-medium">Quick sample numbers:</span>
+                  <div className="flex items-center gap-1.5">
+                    {[
+                      { label: "Rahul (Regular)", digits: "9876543210" },
+                      { label: "Simran (VIP)", digits: "9654321098" },
+                      { label: "New Guest", digits: "8236699885" },
+                    ].map((sample) => (
+                      <button
+                        key={sample.digits}
+                        type="button"
+                        onClick={() => {
+                          setPhoneDigits(sample.digits);
+                        }}
+                        className="px-2.5 py-1 rounded-md bg-white text-zinc-700 hover:text-zinc-950 shadow-xs hover:bg-zinc-50 transition font-mono text-[11px]"
+                      >
+                        {sample.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Matched Customer Card or Keypad */}
-            {matchedCustomer && !visitLoggedNotice ? (
-              <div className="bg-white rounded-2xl p-6 shadow-xs space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                {/* Guest Profile Row */}
+                {/* Hero Phone Display */}
+                <div className="bg-white rounded-2xl p-7 text-center shadow-xs space-y-1">
+                  <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">Customer Mobile</span>
+                  <div className="text-3xl sm:text-4xl font-mono font-semibold text-zinc-900 min-h-[52px] flex items-center justify-center tracking-tight">
+                    {phoneDigits ? formatPhoneDisplay(phoneDigits) : <span className="text-zinc-300">98765 00000</span>}
+                  </div>
+                  <p className="text-xs text-zinc-400">
+                    {phoneDigits.length === 10
+                      ? isExistingCustomer
+                        ? "✓ Verified Regular Customer found"
+                        : "✨ Unregistered mobile • Will enroll as First-Time Guest"
+                      : `Enter 10 digits (${10 - phoneDigits.length} remaining)`}
+                  </p>
+                </div>
+
+                {/* Tactile Touch Keypad */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "⌫"].map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleKeypadPress(key)}
+                      className="h-14 sm:h-16 rounded-2xl bg-white text-xl font-medium text-zinc-900 shadow-xs active:scale-95 transition-all hover:bg-zinc-50 flex items-center justify-center select-none"
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Continue Action */}
+                <button
+                  type="button"
+                  disabled={phoneDigits.length < 10}
+                  onClick={() => setCounterStep(2)}
+                  className={`w-full py-4 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2 shadow-xs ${
+                    phoneDigits.length === 10
+                      ? "bg-zinc-950 text-white hover:bg-zinc-800 active:scale-[0.99] cursor-pointer"
+                      : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                  }`}
+                >
+                  Continue to Rewards →
+                </button>
+              </div>
+            )}
+
+            {/* -----------------------------------------------------------------
+                STEP 2: REWARD & RECOGNITION (DEDICATED VIEW)
+            ----------------------------------------------------------------- */}
+            {counterStep === 2 && (
+              <div className="bg-white rounded-2xl p-7 shadow-xs space-y-6 animate-in fade-in duration-150">
+                {/* Back Nav */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-zinc-900 text-white font-semibold flex items-center justify-center text-lg">
-                      {matchedCustomer.name.charAt(0)}
+                  <button
+                    type="button"
+                    onClick={() => setCounterStep(1)}
+                    className="text-xs font-medium text-zinc-400 hover:text-zinc-800 flex items-center gap-1 transition"
+                  >
+                    ← Back to Phone ({formatPhoneDisplay(phoneDigits)})
+                  </button>
+                  <span className="text-[11px] font-mono text-zinc-400">Step 2 of 3</span>
+                </div>
+
+                {/* Profile Section */}
+                <div className="flex items-start justify-between gap-4 pt-1">
+                  <div className="flex items-center gap-3.5">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
+                      isExistingCustomer
+                        ? "bg-zinc-950 text-white"
+                        : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {isExistingCustomer ? currentCounterCustomer.name.charAt(0) : "★"}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-base text-zinc-900">{matchedCustomer.name}</h3>
-                        <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-100 text-zinc-700">
-                          {matchedCustomer.visits} visits
+                        <h2 className="text-lg font-semibold text-zinc-900 tracking-tight">
+                          {currentCounterCustomer.name}
+                        </h2>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
+                          isExistingCustomer
+                            ? "bg-zinc-100 text-zinc-800"
+                            : "bg-amber-50 text-amber-800"
+                        }`}>
+                          {isExistingCustomer ? `${currentCounterCustomer.visits} visits` : "First-Time Guest"}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-500">Favorite: {matchedCustomer.favoriteItem} • Since {matchedCustomer.customerSince}</p>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        {isExistingCustomer
+                          ? `Favorite: ${currentCounterCustomer.favoriteItem} • Member since ${currentCounterCustomer.customerSince}`
+                          : "New customer auto-enrolled on this bill"}
+                      </p>
                     </div>
-                  </div>
-                  <button
-                    onClick={handleResetCounter}
-                    className="text-xs text-zinc-400 hover:text-zinc-700 font-medium px-2 py-1 rounded-md hover:bg-zinc-100 transition"
-                  >
-                    Change
-                  </button>
-                </div>
-
-                {/* Unlocked Reward Row */}
-                <div className="bg-zinc-50 rounded-xl p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
-                      ₹
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm text-zinc-900">
-                        ₹{matchedCustomer.availableReward} Available Loyalty Reward
-                      </div>
-                      <div className="text-xs text-zinc-500">Ready to redeem on current bill</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-600 font-medium hidden sm:inline">Apply in POS</span>
-                    <Toggle checked={isRewardAppliedInPos} onChange={setIsRewardAppliedInPos} />
                   </div>
                 </div>
 
-                {/* Receipt OCR Capture */}
-                <div className="flex items-center justify-between pt-1">
-                  <div className="text-xs text-zinc-500">
-                    Bill Amount:{" "}
-                    <span className="font-semibold text-zinc-900 text-sm">
-                      {scannedBillAmount ? `₹${scannedBillAmount}` : "₹380 (Table 4)"}
-                    </span>
-                    {isRewardAppliedInPos && (
-                      <span className="text-emerald-600 ml-1.5 font-medium">
-                        (₹{matchedCustomer.availableReward} off applied → Pay ₹{Math.max(0, (scannedBillAmount || 380) - matchedCustomer.availableReward)})
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={handleScanBill}
-                    disabled={isScanningBill}
-                    className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-950 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/70 transition"
-                  >
-                    <IconCamera className="w-3.5 h-3.5" />
-                    {isScanningBill ? "Scanning receipt..." : "Scan Slip OCR"}
-                  </button>
-                </div>
-
-                {/* Laser scan animation when active */}
-                {isScanningBill && (
-                  <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-zinc-900 h-full w-1/2 animate-pulse rounded-full" />
+                {/* Optional Name Input for New Guest */}
+                {!isExistingCustomer && (
+                  <div className="pt-1">
+                    <label className="text-[11px] text-zinc-400 block mb-1 font-medium">Guest Name (Optional)</label>
+                    <input
+                      type="text"
+                      value={newGuestName}
+                      onChange={(e) => setNewGuestName(e.target.value)}
+                      placeholder="e.g. Vikram"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-zinc-50 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                    />
                   </div>
                 )}
 
-                {/* Complete Visit Button */}
+                {/* High-Impact Reward Card */}
+                {isExistingCustomer ? (
+                  <div className="bg-emerald-50/80 rounded-2xl p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800 tracking-wide uppercase">
+                        Loyalty Reward Available
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-emerald-900">Apply Discount</span>
+                        <Toggle checked={isRewardAppliedInPos} onChange={setIsRewardAppliedInPos} />
+                      </div>
+                    </div>
+
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold font-mono text-emerald-950">
+                        ₹{currentCounterCustomer.availableReward} OFF
+                      </span>
+                      <span className="text-xs text-emerald-800">unlocked on current bill</span>
+                    </div>
+
+                    <p className="text-xs text-emerald-700/90 leading-relaxed">
+                      {isRewardAppliedInPos
+                        ? `Cashier: Deduct ₹${currentCounterCustomer.availableReward} on POS machine before collecting payment.`
+                        : "Reward saved for customer's next visit."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-amber-50/80 rounded-2xl p-5 space-y-2">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800 tracking-wide uppercase">
+                      Welcome Incentive
+                    </span>
+                    <div className="text-2xl font-bold font-mono text-amber-950">
+                      ₹50 OFF on Visit #2
+                    </div>
+                    <p className="text-xs text-amber-700/90 leading-relaxed">
+                      Guest will automatically receive an instant WhatsApp welcome message with their digital loyalty pass.
+                    </p>
+                  </div>
+                )}
+
+                {/* Proceed Action */}
                 <button
-                  onClick={handleCompleteVisit}
-                  className="w-full py-3.5 rounded-xl bg-[#0A0A0B] text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-xs"
+                  type="button"
+                  onClick={() => setCounterStep(3)}
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                 >
-                  <IconCheck className="w-4 h-4" />
-                  Complete Visit (₹{Math.max(0, (scannedBillAmount || 380) - (isRewardAppliedInPos ? matchedCustomer.availableReward : 0))})
+                  Proceed to Bill Capture →
                 </button>
               </div>
-            ) : visitLoggedNotice ? (
-              /* Success Confirmation */
-              <div className="bg-white rounded-2xl p-8 text-center shadow-xs space-y-4 animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
-                  <IconCheck className="w-6 h-6" />
+            )}
+
+            {/* -----------------------------------------------------------------
+                STEP 3: BILL CAPTURE & CHECKOUT (DEDICATED VIEW)
+            ----------------------------------------------------------------- */}
+            {counterStep === 3 && (
+              <div className="bg-white rounded-2xl p-7 shadow-xs space-y-6 animate-in fade-in duration-150">
+                {/* Back Nav */}
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setCounterStep(2)}
+                    className="text-xs font-medium text-zinc-400 hover:text-zinc-800 flex items-center gap-1 transition"
+                  >
+                    ← Back to Reward
+                  </button>
+                  <span className="text-[11px] font-mono text-zinc-400">Step 3 of 3</span>
                 </div>
+
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-900">Visit Logged Successfully</h3>
+                  <h3 className="text-base font-semibold text-zinc-900">Capture Bill Total</h3>
+                  <p className="text-xs text-zinc-400 mt-0.5">Scan paper receipt or choose quick bill amount</p>
+                </div>
+
+                {/* Simulated Slip OCR Box */}
+                <div className="bg-zinc-50 rounded-2xl p-5 text-center space-y-3">
+                  <div className="w-10 h-10 rounded-full bg-white shadow-xs text-zinc-800 mx-auto flex items-center justify-center">
+                    <IconCamera className="w-5 h-5" />
+                  </div>
+
+                  <div>
+                    <div className="font-medium text-xs text-zinc-900">
+                      {billScannedNotice ? "✓ Receipt Scanned (Table 4)" : "Receipt OCR Scanner"}
+                    </div>
+                    <div className="text-[11px] text-zinc-400 mt-0.5">
+                      Point counter camera at thermal POS receipt
+                    </div>
+                  </div>
+
+                  {isScanningBill ? (
+                    <div className="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-zinc-900 h-full w-2/3 animate-pulse rounded-full" />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleScanBill}
+                      className="px-4 py-2 rounded-xl bg-white shadow-xs text-zinc-800 font-medium text-xs hover:bg-zinc-100 transition inline-flex items-center gap-2"
+                    >
+                      <IconCamera className="w-3.5 h-3.5" />
+                      {billScannedNotice ? "Re-scan Thermal Slip" : "Simulate Receipt Scan"}
+                    </button>
+                  )}
+                </div>
+
+                {/* Quick Amount Chips */}
+                <div className="space-y-1.5">
+                  <span className="text-[11px] text-zinc-400 font-medium">Or select bill preset:</span>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[240, 380, 520, 750].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setBillAmount(amt)}
+                        className={`py-2 rounded-xl text-xs font-mono font-medium transition shadow-xs ${
+                          billAmount === amt
+                            ? "bg-zinc-950 text-white"
+                            : "bg-zinc-50 text-zinc-800 hover:bg-zinc-100"
+                        }`}
+                      >
+                        ₹{amt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Financial Summary Math */}
+                <div className="border-t border-zinc-100 pt-4 space-y-2 text-xs">
+                  <div className="flex items-center justify-between text-zinc-500">
+                    <span>Gross Bill Amount</span>
+                    <span className="font-mono font-medium text-zinc-900">₹{billAmount}</span>
+                  </div>
+
+                  {isExistingCustomer && isRewardAppliedInPos && (
+                    <div className="flex items-center justify-between text-emerald-600 font-medium">
+                      <span>Loyalty Discount Deducted</span>
+                      <span className="font-mono">-₹{currentCounterCustomer.availableReward}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                    <span className="font-semibold text-zinc-900 text-sm">Net Payable at Counter</span>
+                    <span className="text-xl font-bold font-mono text-zinc-950">
+                      ₹
+                      {Math.max(
+                        0,
+                        billAmount -
+                          (isExistingCustomer && isRewardAppliedInPos
+                            ? currentCounterCustomer.availableReward
+                            : 0)
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Final Confirm Button */}
+                <button
+                  type="button"
+                  onClick={handleCompleteVisit}
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white font-medium text-sm hover:bg-zinc-800 transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                >
+                  <IconCheck className="w-4 h-4" />
+                  Confirm & Punch Bill (₹
+                  {Math.max(
+                    0,
+                    billAmount -
+                      (isExistingCustomer && isRewardAppliedInPos
+                        ? currentCounterCustomer.availableReward
+                        : 0)
+                  )}
+                  )
+                </button>
+              </div>
+            )}
+
+            {/* -----------------------------------------------------------------
+                STEP 4: SUCCESS CONFIRMATION & LIVE WHATSAPP LOOP
+            ----------------------------------------------------------------- */}
+            {counterStep === 4 && (
+              <div className="bg-white rounded-2xl p-8 text-center shadow-xs space-y-6 animate-in fade-in duration-150">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
+                  <IconCheck className="w-7 h-7" />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">Visit Recorded Successfully!</h2>
                   <p className="text-xs text-zinc-500 mt-1">
-                    Loyalty points recorded & automated WhatsApp receipt sent to {phoneDigits ? formatPhoneDisplay(phoneDigits) : "customer"}.
+                    Loyalty points added & instant digital receipt dispatched via WhatsApp.
                   </p>
                 </div>
-                <div className="pt-2">
-                  <button
-                    onClick={handleResetCounter}
-                    className="w-full py-3 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition active:scale-95"
-                  >
-                    Next Customer
-                  </button>
+
+                {/* WhatsApp Receipt Card Mockup */}
+                <div className="bg-[#EFEAE2] p-4 rounded-2xl text-left max-w-sm mx-auto shadow-xs">
+                  <div className="bg-white rounded-xl p-3.5 text-xs text-zinc-800 shadow-xs space-y-1.5 leading-relaxed">
+                    <div className="font-semibold text-zinc-950 flex items-center justify-between">
+                      <span>The Daily Brew • Indiranagar</span>
+                      <span className="text-[10px] text-zinc-400 font-normal">Now</span>
+                    </div>
+                    <p className="text-zinc-700">
+                      Hi {currentCounterCustomer.name.split(" ")[0]}! Thanks for visiting us today ☕
+                    </p>
+                    <p className="text-zinc-600 font-mono text-[11px] bg-zinc-50 p-2 rounded-lg">
+                      Bill Paid: ₹
+                      {Math.max(
+                        0,
+                        billAmount -
+                          (isExistingCustomer && isRewardAppliedInPos
+                            ? currentCounterCustomer.availableReward
+                            : 0)
+                      )}
+                      {isExistingCustomer && isRewardAppliedInPos && " • Saved ₹" + currentCounterCustomer.availableReward}
+                    </p>
+                    <p className="text-zinc-500 text-[11px]">
+                      {isExistingCustomer
+                        ? "2 more visits to unlock your next ₹100 loyalty milestone!"
+                        : "Welcome! Your ₹50 reward is saved for Visit #2."}
+                    </p>
+                    <div className="text-[9px] text-zinc-400 text-right flex items-center justify-end gap-1 pt-1">
+                      <span>Delivered</span>
+                      <span className="text-sky-600">✓✓</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Tactile Touch Keypad */
-              <div className="grid grid-cols-3 gap-2.5">
-                {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "⌫"].map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => handleKeypadPress(key)}
-                    className="h-14 sm:h-16 rounded-2xl bg-white text-xl font-medium text-zinc-900 shadow-xs active:scale-95 transition-all hover:bg-zinc-50 flex items-center justify-center select-none"
-                  >
-                    {key}
-                  </button>
-                ))}
+
+                <button
+                  type="button"
+                  onClick={handleResetCounter}
+                  className="w-full py-4 rounded-2xl bg-zinc-950 text-white text-sm font-medium hover:bg-zinc-800 transition active:scale-95 shadow-xs cursor-pointer"
+                >
+                  Next Customer (New Bill)
+                </button>
               </div>
             )}
           </div>
